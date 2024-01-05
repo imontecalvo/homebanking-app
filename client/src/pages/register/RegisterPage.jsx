@@ -14,14 +14,41 @@ const RegisterForm = () => {
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [currency, setCurrency] = React.useState("");
 
+  const [errorUsername, setErrorUsername] = React.useState(false);
+  const [errorPassword, setErrorPassword] = React.useState(false);
+  const [errorConfirmPassword, setErrorConfirmPassword] = React.useState(false);
+  const [errorCurrency, setErrorCurrency] = React.useState(false);
+
   const navigate = useNavigate();
 
   const nav2Login = () => {
     navigate("/login");
   };
 
+  const updateErrorState = () => {
+    setErrorUsername(username == "");
+    setErrorPassword(password == "" || password != confirmPassword);
+    setErrorConfirmPassword(
+      confirmPassword == "" || password != confirmPassword
+    );
+    setErrorCurrency(currency == "");
+  };
+
   const handleRegister = () => {
-    console.log(`Register: ${username} ${password} ${confirmPassword} ${currency}`); //TODO: Send Request to backend
+    updateErrorState();
+    if (
+      username == "" ||
+      password == "" ||
+      confirmPassword == "" ||
+      currency == "" ||
+      password != confirmPassword
+    ) {
+      return;
+    }
+
+    console.log(
+      `Register: ${username} ${password} ${confirmPassword} ${currency}`
+    ); //TODO: Send Request to backend
   };
 
   return (
@@ -31,33 +58,35 @@ const RegisterForm = () => {
       </h1>
       <div className="input-container">
         <TextField
+          label="Username"
+          error={errorUsername}
           onChange={(e) => {
             setUsername(e.target.value);
           }}
-          label="Username"
           variant="outlined"
           style={{ marginBottom: 15 }}
         />
         <TextField
+          label="Password"
+          error={errorPassword}
           onChange={(e) => {
             setPassword(e.target.value);
           }}
           type="password"
-          label="Password"
           variant="outlined"
           style={{ marginBottom: 15 }}
           password={true}
         />
         <TextField
+          label="Confirm password"
+          error={errorConfirmPassword}
           onChange={(e) => {
             setConfirmPassword(e.target.value);
           }}
           type="password"
-          label="Confirm password"
           variant="outlined"
           style={{ marginBottom: 15 }}
           password={true}
-
         />
         <div
           style={{
@@ -76,7 +105,7 @@ const RegisterForm = () => {
           >
             Main currency{" "}
           </h1>
-          <CurrencyList onChange={setCurrency} />
+          <CurrencyList onChange={setCurrency} error={errorCurrency} />
         </div>
         <div
           style={{

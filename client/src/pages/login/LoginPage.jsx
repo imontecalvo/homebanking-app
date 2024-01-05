@@ -10,14 +10,28 @@ const LoginForm = () => {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
 
+  const [errorUsername, setErrorUsername] = React.useState(false);
+  const [errorPassword, setErrorPassword] = React.useState(false);
+
   const navigate = useNavigate();
 
   const nav2Register = () => {
     navigate("/register");
   };
 
+  const updateErrorState = () => {
+    setErrorUsername(username == "");
+    setErrorPassword(password == "");
+  }
+
+
   const handleLogin = () => {
-    console.log(`Login ${username} ${password}`);
+    updateErrorState();
+    if (username == "" || password == "") {
+      return;
+    }
+
+    console.log(`Login: ${username} ${password}`); //TODO: Send Request to backend
     navigate("/home");
   };
 
@@ -29,16 +43,22 @@ const LoginForm = () => {
       <div className="input-container">
         <TextField
           label="Username"
+          error={errorUsername}
           variant="outlined"
           style={{ marginBottom: 15 }}
-          onChange={(e) => {setUsername(e.target.value);}}
+          onChange={(e) => {
+            setUsername(e.target.value);
+          }}
         />
         <TextField
           label="Password"
+          error={errorPassword}
           type="password"
           variant="outlined"
           style={{ marginBottom: 30 }}
-          onChange={(e) => {setPassword(e.target.value);}}
+          onChange={(e) => {
+            setPassword(e.target.value);
+          }}
         />
         <div
           style={{

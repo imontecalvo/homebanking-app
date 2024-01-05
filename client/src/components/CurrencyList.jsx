@@ -4,8 +4,13 @@ import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 
-const CurrencyList = ({ onChange }) => {
+const CurrencyList = ({ onChange, error = false }) => {
   const [currency, setCurrency] = React.useState("");
+  const [errorList, setErrorList] = React.useState(false);
+
+  React.useEffect(() => {
+    setErrorList(error);
+  }, [error]);
 
   const handleChange = (event) => {
     const selectedCurrency = event.target.value;
@@ -14,10 +19,11 @@ const CurrencyList = ({ onChange }) => {
   };
 
   return (
-    <div style={{width:110}}>
+    <div style={{ width: 110 }}>
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">Currency</InputLabel>
         <Select
+          error={errorList}
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           value={currency}

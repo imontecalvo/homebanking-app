@@ -1,0 +1,25 @@
+.card {
+  border-radius: 15px;
+  background-color: rgb(238, 238, 238);
+  border: 2px solid #2e2e2e;
+  padding: 20px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  color:"black"
+}
+
+.card:hover {
+  background-image: radial-gradient(circle at top right, rgb(1, 77, 139), rgb(11, 45, 88) 50%);
+  border: 2px solid white;
+  color: white;
+}
+
+.title {
+  font-family: system-ui;
+  font-weight: 550;
+  font-size: 35px;
+  /* color: white; */
+  margin: 0%;
+}

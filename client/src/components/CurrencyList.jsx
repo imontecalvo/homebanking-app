@@ -24,8 +24,6 @@ const CurrencyList = ({ onChange, error = false }) => {
         <InputLabel id="demo-simple-select-label">Currency</InputLabel>
         <Select
           error={errorList}
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
           value={currency}
           label="Currency"
           onChange={handleChange}

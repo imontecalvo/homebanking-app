@@ -11,12 +11,12 @@ const HomePage = () => {
 
   const [balances, setBalances] = React.useState([]);
   const symbols = {
-    "ARS": ["$", "🇦🇷"],
-    "CLP": ["$", "🇨🇱"],
-    "EUR": ["€", "🇪🇺"],
-    "TRY": ["₺", "🇹🇷"],
-    "USD": ["$", "🇺🇸"],
-    "GBP": ["£", "🇬🇧"],
+    ARS: ["$", "🇦🇷"],
+    CLP: ["$", "🇨🇱"],
+    EUR: ["€", "🇪🇺"],
+    TRY: ["₺", "🇹🇷"],
+    USD: ["$", "🇺🇸"],
+    GBP: ["£", "🇬🇧"],
   };
 
   React.useEffect(() => {
@@ -37,7 +37,7 @@ const HomePage = () => {
     };
 
     getBalances();
-  },[]);
+  }, []);
 
   return (
     <>
@@ -59,6 +59,7 @@ const HomePage = () => {
             {balances.map((balance) => {
               return (
                 <CurrencyBalance
+                  key={balance[0]}
                   currency={balance[0]}
                   symbol={symbols[balance[0]][0]}
                   flag={symbols[balance[0]][1]}

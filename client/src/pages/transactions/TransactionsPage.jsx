@@ -82,7 +82,7 @@ const TransactionsPage = () => {
               {activeModal === "Deposit" ? (
                 <DepositContent onClose={handleClose} showSnackBar={showSnackBar} />
               ) : activeModal === "Withdraw" ? (
-                <WithdrawContent onClose={handleClose} />
+                <WithdrawContent onClose={handleClose} showSnackBar={showSnackBar}/>
               ) : activeModal === "Transfer" ? (
                 <TransferContent onClose={handleClose} />
               ) : (

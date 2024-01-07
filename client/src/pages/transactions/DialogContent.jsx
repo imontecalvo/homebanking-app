@@ -50,7 +50,6 @@ export const DepositContent = ({ onClose, showSnackBar }) => {
         <NumberInput
           aria-label="Amount"
           placeholder="Amount"
-          value={amount}
           onChange={(event, val) => setAmount(val)}
           style={{ marginBottom: 10, marginLeft: 10, height: 46 }}
         />
@@ -73,12 +72,29 @@ export const DepositContent = ({ onClose, showSnackBar }) => {
   );
 };
 
-export const WithdrawContent = (onClose) => {
+export const WithdrawContent = ({onClose, showSnackBar}) => {
   const [currency, setCurrency] = React.useState("");
   const [amount, setAmount] = React.useState(0);
 
-  const handleWithdraw = () => {
-    console.log(`Withdraw ${amount} (${currency})`); //TODO: Send Request to backend
+  const user_id = localStorage.getItem("user_id");
+
+  const handleWithdraw = async () => {
+    try {
+      const res = await axios.post(
+        `http://localhost:3001/transactions/withdraw`,
+        {
+          user_id: user_id,
+          amount: amount,
+          currency: currency,
+        }
+      );
+      onClose();
+      showSnackBar(res.data.msg, "success");
+    } catch (e) {
+      console.log(e.response)
+      showSnackBar(e.response.data.msg, "error");
+      console.log(e);
+    }
   };
 
   return (
@@ -100,7 +116,6 @@ export const WithdrawContent = (onClose) => {
         <NumberInput
           aria-label="Amount"
           placeholder="Amount"
-          value={amount}
           onChange={(event, val) => setAmount(val)}
           style={{ marginBottom: 10, marginLeft: 10, height: 46 }}
         />
@@ -151,7 +166,6 @@ export const TransferContent = ({ onClose }) => {
         <NumberInput
           aria-label="Amount"
           placeholder="Amount"
-          value={amount}
           onChange={(event, val) => setAmount(val)}
           style={{ marginBottom: 10, marginLeft: 10, height: 46 }}
         />

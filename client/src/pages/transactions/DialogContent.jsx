@@ -3,13 +3,32 @@ import CurrencyList from "../../components/CurrencyList";
 import * as React from "react";
 import TextField from "@mui/material/TextField";
 import { Button } from "@mui/material";
+import NumberInput from "../../components/NumericInput";
 
-export const DepositContent = () => {
+import axios from "axios";
+
+export const DepositContent = ({ onClose, showSnackBar }) => {
   const [currency, setCurrency] = React.useState("");
   const [amount, setAmount] = React.useState(0);
 
-  const handleDeposit = () => {
-    console.log(`Deposit ${amount} (${currency})`); //TODO: Send Request to backend
+  const user_id = localStorage.getItem("user_id");
+
+  const handleDeposit = async () => {
+    try {
+      const res = await axios.post(
+        `http://localhost:3001/transactions/deposit`,
+        {
+          user_id: user_id,
+          amount: amount,
+          currency: currency,
+        }
+      );
+      onClose();
+      showSnackBar(res.data.msg, "success");
+    } catch (e) {
+      showSnackBar(e.response.data.msg, "error");
+      console.log(e);
+    }
   };
 
   return (
@@ -28,11 +47,12 @@ export const DepositContent = () => {
         }}
       >
         <CurrencyList onChange={setCurrency} />
-        <TextField
-          label="Amount"
-          variant="outlined"
-          style={{ marginBottom: 10, marginLeft: 10 }}
-          onChange={(e) => setAmount(e.target.value)}
+        <NumberInput
+          aria-label="Amount"
+          placeholder="Amount"
+          value={amount}
+          onChange={(event, val) => setAmount(val)}
+          style={{ marginBottom: 10, marginLeft: 10, height: 46 }}
         />
       </div>
       <Button
@@ -53,7 +73,7 @@ export const DepositContent = () => {
   );
 };
 
-export const WithdrawContent = () => {
+export const WithdrawContent = (onClose) => {
   const [currency, setCurrency] = React.useState("");
   const [amount, setAmount] = React.useState(0);
 
@@ -77,11 +97,12 @@ export const WithdrawContent = () => {
         }}
       >
         <CurrencyList onChange={setCurrency} />
-        <TextField
-          label="Amount"
-          variant="outlined"
-          style={{ marginBottom: 10, marginLeft: 10 }}
-          onChange={(e) => setAmount(e.target.value)}
+        <NumberInput
+          aria-label="Amount"
+          placeholder="Amount"
+          value={amount}
+          onChange={(event, val) => setAmount(val)}
+          style={{ marginBottom: 10, marginLeft: 10, height: 46 }}
         />
       </div>
       <Button
@@ -102,14 +123,13 @@ export const WithdrawContent = () => {
   );
 };
 
-export const TransferContent = () => {
+export const TransferContent = ({ onClose }) => {
   const [currency, setCurrency] = React.useState("");
   const [amount, setAmount] = React.useState(0);
   const [username, setUsername] = React.useState("");
 
   const handleTransfer = () => {
     console.log(`Transfer ${amount} (${currency}) to ${username}`); //TODO: Send Request to backend
-
   };
 
   return (
@@ -128,11 +148,12 @@ export const TransferContent = () => {
         }}
       >
         <CurrencyList onChange={setCurrency} />
-        <TextField
-          label="Amount"
-          variant="outlined"
-          style={{ marginBottom: 10, marginLeft: 10 }}
-          onChange={(e) => setAmount(e.target.value)}
+        <NumberInput
+          aria-label="Amount"
+          placeholder="Amount"
+          value={amount}
+          onChange={(event, val) => setAmount(val)}
+          style={{ marginBottom: 10, marginLeft: 10, height: 46 }}
         />
       </div>
       <div

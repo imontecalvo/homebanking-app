@@ -14,7 +14,7 @@ const Balance = sequelize.define(
       primaryKey: true,
     },
     amount: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DOUBLE,
       allowNull: false,
     },
   },

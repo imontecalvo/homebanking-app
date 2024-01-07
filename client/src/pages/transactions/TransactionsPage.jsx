@@ -84,7 +84,7 @@ const TransactionsPage = () => {
               ) : activeModal === "Withdraw" ? (
                 <WithdrawContent onClose={handleClose} showSnackBar={showSnackBar}/>
               ) : activeModal === "Transfer" ? (
-                <TransferContent onClose={handleClose} />
+                <TransferContent onClose={handleClose} showSnackBar={showSnackBar}/>
               ) : (
                 <></>
               )}

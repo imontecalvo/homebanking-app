@@ -27,7 +27,6 @@ export const DepositContent = ({ onClose, showSnackBar }) => {
       showSnackBar(res.data.msg, "success");
     } catch (e) {
       showSnackBar(e.response.data.msg, "error");
-      console.log(e);
     }
   };
 
@@ -91,9 +90,7 @@ export const WithdrawContent = ({onClose, showSnackBar}) => {
       onClose();
       showSnackBar(res.data.msg, "success");
     } catch (e) {
-      console.log(e.response)
       showSnackBar(e.response.data.msg, "error");
-      console.log(e);
     }
   };
 
@@ -138,13 +135,29 @@ export const WithdrawContent = ({onClose, showSnackBar}) => {
   );
 };
 
-export const TransferContent = ({ onClose }) => {
+export const TransferContent = ({ onClose, showSnackBar }) => {
   const [currency, setCurrency] = React.useState("");
   const [amount, setAmount] = React.useState(0);
   const [username, setUsername] = React.useState("");
 
-  const handleTransfer = () => {
-    console.log(`Transfer ${amount} (${currency}) to ${username}`); //TODO: Send Request to backend
+  const user_id = localStorage.getItem("user_id");
+
+  const handleTransfer = async () => {
+    try {
+      const res = await axios.post(
+        `http://localhost:3001/transactions/transfer`,
+        {
+          user_id: user_id,
+          amount: amount,
+          currency: currency,
+          destUsername: username,
+        }
+      );
+      onClose();
+      showSnackBar(res.data.msg, "success");
+    } catch (e) {
+      showSnackBar(e.response.data.msg, "error");
+    }
   };
 
   return (

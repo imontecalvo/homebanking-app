@@ -8,8 +8,6 @@ import ExchangePage from "./pages/exchange/ExchangePage";
 
 function App() {
   return (
-    // <LoginForm />
-    // <RegisterForm/>
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginForm/>}/>

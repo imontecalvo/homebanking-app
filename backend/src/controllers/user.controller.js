@@ -31,7 +31,7 @@ export const createUser = async (req, res) => {
 
     //Crear usuario
     const user = await User.create({ username, password });
-    initialize_balance(user.id, currency);
+    initialize_balance(user.user_id, currency);
     return res.status(201).json({ msg: user, ok: true });
   } catch (error) {
     console.log(error);
@@ -60,7 +60,32 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ msg: "Wrong password", ok: false });
     }
 
-    return res.status(200).json({ msg: {username:user.username, user_id:user.user_id}, ok: true });
+    return res
+      .status(200)
+      .json({
+        msg: { username: user.username, user_id: user.user_id },
+        ok: true,
+      });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Server error", ok: false });
+  }
+};
+
+export const getUserBalance = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await User.findOne({ where: { user_id: id } });
+    if (!user) {
+      return res.status(400).json({ msg: "User not found", ok: false });
+    }
+
+    const balance = await Balance.findAll({
+      where: { user_id: id },
+      attributes: ["currency", "amount"],
+    });
+    return res.status(200).json({ msg: balance, ok: true });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Server error", ok: false });

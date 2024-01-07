@@ -5,7 +5,7 @@ import Balance from "./Balance.js";
 import Transaction from "./Transaction.js";
 
 const User = sequelize.define("user", {
-  id: {
+  user_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,

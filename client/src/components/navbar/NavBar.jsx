@@ -3,6 +3,7 @@ import { AppBar, Tabs, Tab, Container, Button } from "@mui/material";
 import Box from "@mui/material/Box";
 import navbar_style from "./navbar_style.css";
 import { useNavigate } from "react-router-dom";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const NavBar = ({ active }) => {
   const navigate = useNavigate();
@@ -17,10 +18,8 @@ const NavBar = ({ active }) => {
         id="home"
         onClick={handleNavClick}
         style={{
+          ...buttonStyle,
           color: "Home" == active ? "yellow" : "white",
-          fontSize: 15,
-          marginLeft: 20,
-          marginRight: 20,
         }}
       >
         Home
@@ -29,10 +28,8 @@ const NavBar = ({ active }) => {
         id="transactions"
         onClick={handleNavClick}
         style={{
+          ...buttonStyle,
           color: "Transactions" == active ? "yellow" : "white",
-          fontSize: 15,
-          marginLeft: 20,
-          marginRight: 20,
         }}
       >
         Transactions
@@ -41,16 +38,28 @@ const NavBar = ({ active }) => {
         id="exchange"
         onClick={handleNavClick}
         style={{
+          ...buttonStyle,
           color: "Exchange" == active ? "yellow" : "white",
-          fontSize: 15,
-          marginLeft: 20,
-          marginRight: 20,
         }}
       >
         Exchange
       </Button>
+      <Button
+        style={{ ...buttonStyle, color: "white", marginLeft: "auto" }}
+        startIcon={<LogoutIcon />}
+        onClick={() => {
+          navigate("/login");
+          localStorage.clear();
+        }}
+      ></Button>
     </div>
   );
 };
 
 export default NavBar;
+
+const buttonStyle = {
+  fontSize: 15,
+  marginLeft: 20,
+  marginRight: 20,
+};

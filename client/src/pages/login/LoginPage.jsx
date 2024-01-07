@@ -5,6 +5,15 @@ import TextField from "@mui/material/TextField";
 import Container from "@mui/material/Container";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import Snackbar from "@mui/material/Snackbar";
+
+import axios from "axios";
+
+import MuiAlert from "@mui/material/Alert";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const LoginForm = () => {
   const [username, setUsername] = React.useState("");
@@ -12,6 +21,9 @@ const LoginForm = () => {
 
   const [errorUsername, setErrorUsername] = React.useState(false);
   const [errorPassword, setErrorPassword] = React.useState(false);
+
+  const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState("");
 
   const navigate = useNavigate();
 
@@ -22,70 +34,97 @@ const LoginForm = () => {
   const updateErrorState = () => {
     setErrorUsername(username == "");
     setErrorPassword(password == "");
-  }
+  };
 
-
-  const handleLogin = () => {
+  const handleLogin = async () => {
     updateErrorState();
     if (username == "" || password == "") {
       return;
     }
 
-    console.log(`Login: ${username} ${password}`); //TODO: Send Request to backend
-    navigate("/home");
+    try {
+      const res = await axios.post("http://localhost:3001/users/login", {
+        username: username,
+        password: password,
+      });
+
+      localStorage.setItem("username", res.data.msg.username);
+      localStorage.setItem("user_id", res.data.msg.user_id);
+      navigate("/home");
+    } catch (e) {
+      setOpen(true);
+      setMessage(e.response.data.msg);
+    }
   };
 
+
+  const handleClose = (e,reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+
   return (
-    <div style={loginContainerStyle}>
-      <h1 className="title" style={{ fontSize: 45, marginBottom: 40 }}>
-        Welcome!
-      </h1>
-      <div className="input-container">
-        <TextField
-          label="Username"
-          error={errorUsername}
-          variant="outlined"
-          style={{ marginBottom: 15 }}
-          onChange={(e) => {
-            setUsername(e.target.value);
-          }}
-        />
-        <TextField
-          label="Password"
-          error={errorPassword}
-          type="password"
-          variant="outlined"
-          style={{ marginBottom: 30 }}
-          onChange={(e) => {
-            setPassword(e.target.value);
-          }}
-        />
-        <div
-          style={{
-            marginTop: "16px",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <Button
-            onClick={nav2Register}
+    <>
+      <div style={loginContainerStyle}>
+        <h1 className="title" style={{ fontSize: 45, marginBottom: 40 }}>
+          Welcome!
+        </h1>
+        <div className="input-container">
+          <TextField
+            label="Username"
+            error={errorUsername}
             variant="outlined"
-            color="primary"
-            style={{ width: 170, borderRadius: 20 }}
+            style={{ marginBottom: 15 }}
+            onChange={(e) => {
+              setUsername(e.target.value);
+            }}
+          />
+          <TextField
+            label="Password"
+            error={errorPassword}
+            type="password"
+            variant="outlined"
+            style={{ marginBottom: 30 }}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+          />
+          <div
+            style={{
+              marginTop: "16px",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
           >
-            Create account
-          </Button>
-          <Button
-            onClick={handleLogin}
-            variant="contained"
-            color="primary"
-            style={{ width: 130, borderRadius: 20 }}
-          >
-            Login
-          </Button>
+            <Button
+              onClick={nav2Register}
+              variant="outlined"
+              color="primary"
+              style={{ width: 170, borderRadius: 20 }}
+            >
+              Create account
+            </Button>
+            <Button
+              onClick={handleLogin}
+              variant="contained"
+              color="primary"
+              style={{ width: 130, borderRadius: 20 }}
+            >
+              Login
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+      <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
+          {message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 

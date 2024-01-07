@@ -79,7 +79,11 @@ const RegisterForm = () => {
     }
   };
 
-  const handleClose = () => {
+  const handleClose = (e,reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
     setOpen(false);
   };
 
@@ -164,7 +168,7 @@ const RegisterForm = () => {
           </div>
         </div>
       </Container>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+      <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
         <Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
           {message}
         </Alert>

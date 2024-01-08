@@ -11,16 +11,20 @@ export const DepositContent = ({ onClose, showSnackBar }) => {
   const [currency, setCurrency] = React.useState("");
   const [amount, setAmount] = React.useState(0);
 
-  const user_id = localStorage.getItem("user_id");
+  const token = localStorage.getItem("token");
 
   const handleDeposit = async () => {
     try {
       const res = await axios.post(
         `http://localhost:3001/transactions/deposit`,
         {
-          user_id: user_id,
           amount: amount,
           currency: currency,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       onClose();
@@ -71,20 +75,24 @@ export const DepositContent = ({ onClose, showSnackBar }) => {
   );
 };
 
-export const WithdrawContent = ({onClose, showSnackBar}) => {
+export const WithdrawContent = ({ onClose, showSnackBar }) => {
   const [currency, setCurrency] = React.useState("");
   const [amount, setAmount] = React.useState(0);
 
-  const user_id = localStorage.getItem("user_id");
+  const token = localStorage.getItem("token");
 
   const handleWithdraw = async () => {
     try {
       const res = await axios.post(
         `http://localhost:3001/transactions/withdraw`,
         {
-          user_id: user_id,
           amount: amount,
           currency: currency,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       onClose();
@@ -140,17 +148,21 @@ export const TransferContent = ({ onClose, showSnackBar }) => {
   const [amount, setAmount] = React.useState(0);
   const [username, setUsername] = React.useState("");
 
-  const user_id = localStorage.getItem("user_id");
+  const token = localStorage.getItem("token");
 
   const handleTransfer = async () => {
     try {
       const res = await axios.post(
         `http://localhost:3001/transactions/transfer`,
         {
-          user_id: user_id,
           amount: amount,
           currency: currency,
           destUsername: username,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       onClose();

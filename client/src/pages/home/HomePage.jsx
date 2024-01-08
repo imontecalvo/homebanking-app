@@ -7,7 +7,7 @@ import axios from "axios";
 
 const HomePage = () => {
   const username = localStorage.getItem("username");
-  const user_id = localStorage.getItem("user_id");
+  const token = localStorage.getItem("token");
 
   const [balances, setBalances] = React.useState([]);
   const symbols = {
@@ -22,9 +22,11 @@ const HomePage = () => {
   React.useEffect(() => {
     const getBalances = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:3001/users/${user_id}/balance`
-        );
+        const res = await axios.get(`http://localhost:3001/users/balance`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         const unsorted_balances = res.data.msg.map((balance) => {
           return [balance.currency, balance.amount];

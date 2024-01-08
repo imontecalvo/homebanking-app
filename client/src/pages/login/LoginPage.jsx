@@ -49,7 +49,7 @@ const LoginForm = () => {
       });
 
       localStorage.setItem("username", res.data.msg.username);
-      localStorage.setItem("user_id", res.data.msg.user_id);
+      localStorage.setItem("token", res.data.msg.token);
       navigate("/home");
     } catch (e) {
       setOpen(true);

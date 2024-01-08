@@ -66,15 +66,24 @@ const ExchangePage = () => {
     setDestinyAmount(0);
   }
 
+  const token = localStorage.getItem("token");
+
   const confirmExchange = async () => {
     try {
-      await axios.post("http://localhost:3001/exchange", {
-        user_id: localStorage.getItem("user_id"),
-        origin_currency: originCurrency,
-        origin_amount: originAmount,
-        destiny_currency: destinyCurrency,
-        destiny_amount: destinyAmount,
-      });
+      await axios.post(
+        "http://localhost:3001/exchange",
+        {
+          origin_currency: originCurrency,
+          origin_amount: originAmount,
+          destiny_currency: destinyCurrency,
+          destiny_amount: destinyAmount,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       resetFields();
       setOpenSnackBar(true);

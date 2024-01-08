@@ -2,7 +2,8 @@ import User from "../models/User.js";
 import Balance from "../models/Balance.js";
 
 export const newDeposit = async (req, res) => {
-  const { user_id, currency, amount } = req.body;
+  const {currency, amount } = req.body;
+  const user_id = req.user.user_id;
 
   //Chequear parametros
   if (!user_id || !currency || !amount) {
@@ -40,7 +41,8 @@ export const newDeposit = async (req, res) => {
 };
 
 export const newWithdraw = async (req, res) => {
-  const { user_id, currency, amount } = req.body;
+  const {currency, amount } = req.body;
+  const user_id = req.user.user_id;
 
   //Chequear parametros
   if (!user_id || !currency || !amount) {
@@ -83,7 +85,8 @@ export const newWithdraw = async (req, res) => {
 };
 
 export const newTransfer = async (req, res) => {
-  const { user_id, currency, amount, destUsername } = req.body;
+  const {currency, amount, destUsername } = req.body;
+  const user_id = req.user.user_id;
 
   //Chequear parametros
   if (!user_id || !currency || !amount || !destUsername) {

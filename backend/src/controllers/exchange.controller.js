@@ -21,8 +21,8 @@ const exchangeWithFee = (amount, origin, destiny) => {
 };
 
 export const newExchange = async (req, res) => {
-  const { user_id, origin_currency, origin_amount, destiny_currency } =
-    req.body;
+  const { origin_currency, origin_amount, destiny_currency } = req.body;
+  const user_id = req.user.user_id;
 
   //Chequear parametros
   if (!user_id || !origin_currency || !origin_amount || !destiny_currency) {

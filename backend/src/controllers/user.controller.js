@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Balance from "../models/Balance.js";
+import { createAccessToken } from "../jwt.js";
 
 const initialize_balance = async (user_id, user_currency) => {
   const currencies = ["USD", "CLP", "ARS", "GBP", "TRY", "EUR"];
@@ -58,7 +59,7 @@ export const loginUser = async (req, res) => {
     //Chequear si la cuenta esta bloqueada
     if (user.login_failed == 3) {
       return res
-        .status(400)
+        .status(401)
         .json({ msg: "Account blocked, contact support", ok: false });
     }
 
@@ -71,18 +72,23 @@ export const loginUser = async (req, res) => {
       //Si ya tenia previamente 2 intentos fallidos, se bloquea la cuenta al ser este el tercero
       if (user.login_failed == 2) {
         return res
-          .status(400)
+          .status(401)
           .json({ msg: "Wrong password, account blocked", ok: false });
       }
       //Si no, se devuelve un mensaje de error
-      return res.status(400).json({ msg: "Wrong password", ok: false });
+      return res.status(401).json({ msg: "Wrong password", ok: false });
     }
 
     //Si la contraseña es correcta, se resetea el contador de intentos fallidos
     await User.update({ login_failed: 0 }, { where: { username } });
 
+    //Se crea el token y se devuelve
+    const token = await createAccessToken({
+      user_id: user.user_id,
+      username: user.username,
+    });
     return res.status(200).json({
-      msg: { username: user.username, user_id: user.user_id },
+      msg: { token, username },
       ok: true,
     });
   } catch (error) {
@@ -92,16 +98,16 @@ export const loginUser = async (req, res) => {
 };
 
 export const getUserBalance = async (req, res) => {
-  const { id } = req.params;
+  const { user_id } = req.user;
 
   try {
-    const user = await User.findOne({ where: { user_id: id } });
+    const user = await User.findOne({ where: { user_id } });
     if (!user) {
       return res.status(400).json({ msg: "User not found", ok: false });
     }
 
     const balance = await Balance.findAll({
-      where: { user_id: id },
+      where: { user_id },
       attributes: ["currency", "amount"],
     });
     return res.status(200).json({ msg: balance, ok: true });

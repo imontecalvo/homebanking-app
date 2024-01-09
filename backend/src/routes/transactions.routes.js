@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { newDeposit, newWithdraw, newTransfer } from "../controllers/transactions.controller.js";
+import {
+  newDeposit,
+  newWithdraw,
+  newTransfer,
+} from "../controllers/transactions.controller.js";
 import { auth } from "../middlewares/auth.middleware.js";
 
 const router = Router();

@@ -13,12 +13,12 @@ const Transaction = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    amount: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     currency: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    amount: {
+      type: DataTypes.DOUBLE,
       allowNull: false,
     },
     date: {

@@ -3,12 +3,13 @@ import { TOKEN_KEY } from "../constants.js";
 
 export const auth = (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
-
+    let token = req.headers.authorization;
     if (!token)
       return res
         .status(401)
         .json({ message: "No token. Authorization denied" });
+
+    token = token.split(" ")[1];
 
     jwt.verify(token, TOKEN_KEY, (error, user) => {
       if (error) {

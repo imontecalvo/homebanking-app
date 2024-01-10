@@ -45,6 +45,16 @@ const NavBar = ({ active }) => {
         Exchange
       </Button>
       <Button
+        id="history"
+        onClick={handleNavClick}
+        style={{
+          ...buttonStyle,
+          color: "History" == active ? "yellow" : "white",
+        }}
+      >
+        History
+      </Button>
+      <Button
         style={{ ...buttonStyle, color: "white", marginLeft: "auto" }}
         startIcon={<LogoutIcon />}
         onClick={() => {

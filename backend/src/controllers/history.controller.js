@@ -9,6 +9,7 @@ export const getHistory = async (req, res) => {
       where: { user_id },
       limit: items,
       offset: (page - 1) * items,
+      order: [["date","DESC"]]
     });
     return res.status(201).json({ msg: transactions, ok: true });
   } catch (error) {

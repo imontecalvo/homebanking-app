@@ -34,16 +34,7 @@ const NavBar = ({ active }) => {
       >
         Transactions
       </Button>
-      <Button
-        id="exchange"
-        onClick={handleNavClick}
-        style={{
-          ...buttonStyle,
-          color: "Exchange" == active ? "yellow" : "white",
-        }}
-      >
-        Exchange
-      </Button>
+
       <Button
         id="history"
         onClick={handleNavClick}
@@ -53,6 +44,16 @@ const NavBar = ({ active }) => {
         }}
       >
         History
+      </Button>
+      <Button
+        id="exchange"
+        onClick={handleNavClick}
+        style={{
+          ...buttonStyle,
+          color: "Exchange" == active ? "yellow" : "white",
+        }}
+      >
+        Exchange
       </Button>
       <Button
         style={{ ...buttonStyle, color: "white", marginLeft: "auto" }}

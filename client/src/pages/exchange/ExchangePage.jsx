@@ -8,6 +8,11 @@ import axios from "axios";
 
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import { BACKEND_URL } from "../../constants.js";
+
+// import {config} from "dotenv";
+// config();
+
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -15,10 +20,10 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const ExchangePage = () => {
   //Campos
   const [originCurrency, setOriginCurrency] = React.useState("");
-  const [originAmount, setOriginAmount] = React.useState(0);
+  const [originAmount, setOriginAmount] = React.useState(0.);
 
   const [destinyCurrency, setDestinyCurrency] = React.useState("");
-  const [destinyAmount, setDestinyAmount] = React.useState(0);
+  const [destinyAmount, setDestinyAmount] = React.useState(0.);
 
   //Snackbar
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
@@ -60,10 +65,8 @@ const ExchangePage = () => {
   }, [originCurrency, destinyCurrency, originAmount]);
 
   function resetFields() {
-    setOriginCurrency("");
-    setOriginAmount(0);
-    setDestinyCurrency("");
-    setDestinyAmount(0);
+    setOriginAmount(0.);
+    setDestinyAmount(0.);
   }
 
   const token = localStorage.getItem("token");
@@ -71,12 +74,11 @@ const ExchangePage = () => {
   const confirmExchange = async () => {
     try {
       await axios.post(
-        "http://localhost:3001/exchange",
+        BACKEND_URL + "/exchange",
         {
           origin_currency: originCurrency,
           origin_amount: originAmount,
           destiny_currency: destinyCurrency,
-          destiny_amount: destinyAmount,
         },
         {
           headers: {
@@ -130,6 +132,7 @@ const ExchangePage = () => {
               setOriginAmount(val);
               calculateDestinyAmount();
             }}
+            value={originAmount}
             style={{ marginBottom: 10, marginLeft: 10, height: 46 }}
           />
         </div>

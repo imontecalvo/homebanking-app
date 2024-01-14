@@ -1,11 +1,13 @@
 import app from "./app.js";
 import {sequelize} from "./db.js";
+import {config} from "dotenv";
+config();
 
 async function main(){
     try {
         await sequelize.sync();
-        app.listen(3001, () => {
-          console.log("Server is listening on port 3000");
+        app.listen(process.env.API_LOCAL_PORT, () => {
+          console.log(`Server is listening on port ${process.env.API_LOCAL_PORT}`);
         });
         console.log("Connection has been established successfully.");
       } catch (error) {

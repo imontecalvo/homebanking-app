@@ -5,6 +5,10 @@ import { LocalConvenienceStoreOutlined, Subtitles } from "@mui/icons-material";
 import CurrencyBalance from "../../components/currency_balance/CurrencyBalance";
 import axios from "axios";
 
+// import {config} from "dotenv";
+// config();
+import {BACKEND_URL} from "../../constants.js"
+
 const HomePage = () => {
   const username = localStorage.getItem("username");
   const token = localStorage.getItem("token");
@@ -22,7 +26,7 @@ const HomePage = () => {
   React.useEffect(() => {
     const getBalances = async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/users/balance`, {
+        const res = await axios.get(BACKEND_URL+`/users/balance`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

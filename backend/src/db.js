@@ -1,11 +1,15 @@
 import Sequelize from "sequelize";
+import { config } from "dotenv";
+
+config();
 
 export const sequelize = new Sequelize(
-  "homebanking", // db name,
-  "postgres", // username
-  "admin", // password
+  process.env.DB_NAME, // db name,
+  process.env.DB_USERNAME, // username
+  process.env.DB_PASSWORD, // password
   {
-    host: "localhost",
+    host: process.env.DB_HOST,
+    port: process.env.DB_LOCAL_PORT,
     dialect: "postgres",
   }
 );

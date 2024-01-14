@@ -12,6 +12,10 @@ import CurrencyList from "../../components/CurrencyList";
 
 import MuiAlert from "@mui/material/Alert";
 
+// import {config} from "dotenv";
+// config();
+import {BACKEND_URL} from "../../constants.js"
+
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -58,7 +62,7 @@ const RegisterForm = () => {
       return;
     }
     try {
-      const res = await axios.post("http://localhost:3001/users/register", {
+      const res = await axios.post(BACKEND_URL+"/users/register", {
         username: username,
         password: password,
         confirmPassword: confirmPassword,

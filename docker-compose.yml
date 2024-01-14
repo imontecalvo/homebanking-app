@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  dbpostgres:
+    image: postgres:12.17
+    container_name: dbpostgres
+    env_file: ./.env
+    environment:
+      - POSTGRES_USER=$DB_USERNAME
+      - POSTGRES_PASSWORD=$DB_PASSWORD
+      - POSTGRES_DB=$DB_NAME
+    ports:
+      - $DB_HOST_PORT:$DB_LOCAL_PORT
+    logging:
+      driver: none
+
+  backend:
+    container_name: backend
+    depends_on:
+      - dbpostgres
+    links:
+      - dbpostgres
+    build: ./backend
+    env_file: ./.env
+    ports:
+      - $API_HOST_PORT:$API_LOCAL_PORT
+
+  frontend:
+    container_name: frontend
+    build: ./client
+    ports:
+      - $FRONTEND_HOST_PORT:$FRONTEND_LOCAL_PORT
+    depends_on:
+      - backend
+    links:
+      - backend
+    env_file: ./.env

@@ -2,11 +2,13 @@ import * as React from "react";
 import NavBar from "../../components/navbar/NavBar";
 import axios from "axios";
 import Pagination from "@mui/material/Pagination";
-import HistoryItem from "../../components/HistoryItem";
 
 import TransactionsTable from "../../components/TransactionsTable";
 
-const ITEMS_PER_PAGE = 5;
+// import {config} from "dotenv";
+// config();
+
+import { BACKEND_URL } from "../../constants";
 
 const HistoryPage = () => {
   const token = localStorage.getItem("token");
@@ -24,27 +26,13 @@ const HistoryPage = () => {
     return Math.ceil((h - 225 - 40) / 70)
   }
 
+
+
   React.useEffect(() => {
-    const updateWinHeight = () => {
-      setWinHeight(window.innerHeight);
-    };
-
-    window.addEventListener("resize", updateWinHeight);
-    setItemsPerPage(calculateItemsPerPage(winHeight))
-
-    return () => {
-      window.removeEventListener("resize", updateWinHeight);
-    };
-  }, []);
-
-
-
-
-  React.useState(() => {
     const getNOfTransactions = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3001/history/n-transactions`,
+          BACKEND_URL+"/history/n-transactions",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -56,6 +44,8 @@ const HistoryPage = () => {
         console.log(e);
       }
     };
+    setWinHeight(window.innerHeight)
+    setItemsPerPage(calculateItemsPerPage(winHeight))
     getNOfTransactions();
   },[]);
 
@@ -63,7 +53,7 @@ const HistoryPage = () => {
     const getTransactions = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3001/history?page=${page}&items=${itemsPerPage}`,
+          BACKEND_URL+`/history?page=${page}&items=${itemsPerPage}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -82,7 +72,6 @@ const HistoryPage = () => {
       }
     };
     getTransactions();
-    console.log("page ", page);
   }, [page, itemsPerPage]);
 
   const handleChange = (event, value) => {

@@ -1,5 +1,3 @@
-import React, { useEffect, useRef } from "react";
-// import { makeStyles } from "@material-ui/core/styles";
 import {
   Table,
   TableBody,
@@ -9,15 +7,6 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
-import { EmojiSymbols } from "@mui/icons-material";
-
-const ROW_HEIGHT = 0;
-
-// const useStyles = makeStyles({
-//   customTableRow: {
-//     height: "50px",
-//   },
-// });
 
 const TransactionsTable = ({ transactions }) => {
   const symbols = {
@@ -43,8 +32,12 @@ const TransactionsTable = ({ transactions }) => {
           {transactions.map((transaction, index) => (
             <TableRow key={index}>
               <TableCell>{transaction.type}</TableCell>
-              <TableCell style={{ ...amountStyle(transaction.amount) }}>
-                {transaction.amount > 0 ? "+ " : "- "}
+              <TableCell
+                style={{ ...amountStyle(transaction.amount, transaction.type) }}
+              >
+                {transaction.amount > 0 && transaction.type !== "Withdraw"
+                  ? "+ "
+                  : "- "}
                 {symbols[transaction.currency]}
                 {transaction.amount > 0
                   ? transaction.amount
@@ -52,10 +45,13 @@ const TransactionsTable = ({ transactions }) => {
                 ({transaction.currency})
               </TableCell>
               <TableCell>
-                {transaction.date.getDate()}/{transaction.date.getMonth()+1}/
-                {transaction.date.getFullYear()}{" - "}{transaction.date.getHours()}
+                {transaction.date.getDate().toString().padStart(2, "0")}/
+                {(transaction.date.getMonth() + 1).toString().padStart(2, "0")}/
+                {transaction.date.getFullYear()}
+                {" - "}
+                {transaction.date.getHours().toString().padStart(2, "0")}
                 {":"}
-                {transaction.date.getMinutes()}
+                {transaction.date.getMinutes().toString().padStart(2, "0")}
                 {" hs"}
               </TableCell>
             </TableRow>
@@ -68,8 +64,8 @@ const TransactionsTable = ({ transactions }) => {
 
 export default TransactionsTable;
 
-const amountStyle = (amount) => {
+const amountStyle = (amount, type) => {
   return {
-    color: amount > 0 ? "green" : "red",
+    color: amount > 0 && type !== "Withdraw" ? "green" : "red",
   };
 };

@@ -7,6 +7,10 @@ import NumberInput from "../../components/NumericInput";
 
 import axios from "axios";
 
+// import {config} from "dotenv";
+// config();
+import {BACKEND_URL} from "../../constants.js"
+
 export const DepositContent = ({ onClose, showSnackBar }) => {
   const [currency, setCurrency] = React.useState("");
   const [amount, setAmount] = React.useState(0);
@@ -16,7 +20,7 @@ export const DepositContent = ({ onClose, showSnackBar }) => {
   const handleDeposit = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:3001/transactions/deposit`,
+        BACKEND_URL+`/transactions/deposit`,
         {
           amount: amount,
           currency: currency,
@@ -84,7 +88,7 @@ export const WithdrawContent = ({ onClose, showSnackBar }) => {
   const handleWithdraw = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:3001/transactions/withdraw`,
+        BACKEND_URL+`/transactions/withdraw`,
         {
           amount: amount,
           currency: currency,
@@ -153,7 +157,7 @@ export const TransferContent = ({ onClose, showSnackBar }) => {
   const handleTransfer = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:3001/transactions/transfer`,
+        BACKEND_URL+`/transactions/transfer`,
         {
           amount: amount,
           currency: currency,

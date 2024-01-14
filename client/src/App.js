@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import { useEffect } from "react";
 import LoginForm from "./pages/login/LoginPage";
 import RegisterForm from "./pages/register/RegisterPage";
 import HomePage from "./pages/home/HomePage";
@@ -9,6 +9,16 @@ import HistoryPage from "./pages/history/HistoryPage";
 import { ProtectedRoute, Landing } from "./protectedRoute";
 
 function App() {
+
+  useEffect(() => {
+    document.title = 'Homebanking App';
+    return () => {
+      document.title = 'Homebanking App';
+    };
+  }, []);
+
+
+
   return (
     <BrowserRouter>
       <Routes>

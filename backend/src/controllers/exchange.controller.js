@@ -17,11 +17,12 @@ const exchangeRate = (amount, origin, destiny) => {
 };
 
 const exchangeWithFee = (amount, origin, destiny) => {
-  return (exchangeRate(amount, origin, destiny) * (1 - FEE)).toFixed(2);
+  return parseFloat((exchangeRate(amount, origin, destiny) * (1 - FEE)).toFixed(2));
 };
 
 export const newExchange = async (req, res) => {
   const { origin_currency, origin_amount, destiny_currency } = req.body;
+
   const user_id = req.user.user_id;
 
   //Chequear parametros
@@ -66,7 +67,8 @@ export const newExchange = async (req, res) => {
     const newAmountDest =
       balanceDest.amount +
       exchangeWithFee(origin_amount, origin_currency, destiny_currency);
-    await Balance.update(
+    
+      await Balance.update(
       { amount: newAmountDest },
       { where: { user_id, currency: destiny_currency } }
     );

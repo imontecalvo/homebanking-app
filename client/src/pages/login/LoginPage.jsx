@@ -11,6 +11,13 @@ import axios from "axios";
 
 import MuiAlert from "@mui/material/Alert";
 
+
+
+// import {config} from "dotenv";
+// config();
+import {BACKEND_URL} from "../../constants.js"
+
+
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -43,7 +50,7 @@ const LoginForm = () => {
     }
 
     try {
-      const res = await axios.post("http://localhost:3001/users/login", {
+      const res = await axios.post(BACKEND_URL+"/users/login", {
         username: username,
         password: password,
       });

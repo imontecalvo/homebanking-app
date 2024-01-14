@@ -7,7 +7,7 @@ En caso de ser la primera vez que desees ejecutarlo y no tengas los componentes 
 sudo docker compose up --build
 ```
 
-### Ejecutar
+### Ejecución
 En caso de ya tener creados los componentes no es necesario realizar el `build` de nuevo, simplemente se puede ejecutar con el comando:
 ```
 sudo docker compose up

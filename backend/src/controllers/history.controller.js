@@ -1,5 +1,7 @@
 import Transaction from "../models/Transaction.js";
 
+// Se obtiene la pagina y cantidad de items por pagina desde la query
+// Se devuelve un array con las transacciones del usuario en la pagina indicada
 export const getHistory = async (req, res) => {
   const { user_id } = req.user;
   const { page, items } = req.query;
@@ -9,7 +11,7 @@ export const getHistory = async (req, res) => {
       where: { user_id },
       limit: items,
       offset: (page - 1) * items,
-      order: [["date","DESC"]]
+      order: [["date", "DESC"]],
     });
     return res.status(201).json({ msg: transactions, ok: true });
   } catch (error) {
@@ -18,6 +20,7 @@ export const getHistory = async (req, res) => {
   }
 };
 
+// Se obtiene la cantidad de transacciones del usuario
 export const nOfTransactions = async (req, res) => {
   const { user_id } = req.user;
 

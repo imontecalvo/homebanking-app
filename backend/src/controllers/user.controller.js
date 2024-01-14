@@ -2,6 +2,8 @@ import User from "../models/User.js";
 import Balance from "../models/Balance.js";
 import { createAccessToken } from "../jwt.js";
 
+// Crea el balance inicial del usuario
+// El balance inicial de la moneda del usuario es 2000, el resto es 0
 const initialize_balance = async (user_id, user_currency) => {
   const currencies = ["USD", "CLP", "ARS", "GBP", "TRY", "EUR"];
   const INIT_BALANCE = 2000;
@@ -97,6 +99,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
+//Se obtienen todos los balances de las distintas monedas del usuario
 export const getUserBalance = async (req, res) => {
   const { user_id } = req.user;
 

@@ -3,6 +3,8 @@ import Balance from "../models/Balance.js";
 
 const FEE = 0.01;
 
+// Recibe moneda de origen, monto y moneda de destino
+// Devuelve la conversion sin comision
 const exchangeRate = (amount, origin, destiny) => {
   const currenciesInUSD = {
     USD: 1,
@@ -16,10 +18,16 @@ const exchangeRate = (amount, origin, destiny) => {
   return amount * (currenciesInUSD[origin] / currenciesInUSD[destiny]);
 };
 
+// Recibe moneda de origen, monto y moneda de destino
+// Devuelve el monto a recibir descontando la comision. El monto se redondea a 2 decimales
 const exchangeWithFee = (amount, origin, destiny) => {
-  return parseFloat((exchangeRate(amount, origin, destiny) * (1 - FEE)).toFixed(2));
+  return parseFloat(
+    (exchangeRate(amount, origin, destiny) * (1 - FEE)).toFixed(2)
+  );
 };
 
+// Recibe moneda de origen, monto y moneda de destino
+// Realiza el cambio modificando los balances en caso de exito
 export const newExchange = async (req, res) => {
   const { origin_currency, origin_amount, destiny_currency } = req.body;
 
@@ -67,8 +75,8 @@ export const newExchange = async (req, res) => {
     const newAmountDest =
       balanceDest.amount +
       exchangeWithFee(origin_amount, origin_currency, destiny_currency);
-    
-      await Balance.update(
+
+    await Balance.update(
       { amount: newAmountDest },
       { where: { user_id, currency: destiny_currency } }
     );

@@ -26,7 +26,6 @@ const User = sequelize.define("user", {
   },
 });
 
-
 User.hasMany(Balance, { foreignKey: "user_id" });
 Balance.belongsTo(User, { foreignKey: "user_id" });
 

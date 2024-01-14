@@ -1,1 +1,1 @@
-export const TOKEN_KEY = "TokenHomebanking2024"
+export const TOKEN_KEY = "TokenHomebanking2024";

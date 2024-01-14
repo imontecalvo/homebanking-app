@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { getHistory, nOfTransactions} from "../controllers/history.controller.js";
+import {
+  getHistory,
+  nOfTransactions,
+} from "../controllers/history.controller.js";
 import { auth } from "../middlewares/auth.middleware.js";
 
 const router = Router();

@@ -9,15 +9,13 @@ import historyRoutes from "./routes/history.routes.js";
 const app = express();
 
 //Middlewares
-app.use(cors())
+app.use(cors());
 app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
 
 //Routes
 app.use("/users", userRoutes);
 app.use("/transactions", transactionsRoutes);
 app.use("/exchange", exchangeRoutes);
 app.use("/history", historyRoutes);
-
 
 export default app;

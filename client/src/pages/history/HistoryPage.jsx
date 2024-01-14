@@ -17,43 +17,37 @@ const HistoryPage = () => {
   const [transactions, setTransactions] = React.useState([]);
   const [page, setPage] = React.useState(1);
 
-  const [itemsPerPage, setItemsPerPage] = React.useState(0)
-
+  const [itemsPerPage, setItemsPerPage] = React.useState(0);
 
   const [winHeight, setWinHeight] = React.useState(window.innerHeight);
 
-  function calculateItemsPerPage(h){
-    return Math.ceil((h - 225 - 40) / 70)
+  function calculateItemsPerPage(h) {
+    return Math.ceil((h - 225 - 40) / 70);
   }
-
-
 
   React.useEffect(() => {
     const getNOfTransactions = async () => {
       try {
-        const res = await axios.get(
-          BACKEND_URL+"/history/n-transactions",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await axios.get(BACKEND_URL + "/history/n-transactions", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setNOfTransactions(res.data.msg);
       } catch (e) {
         console.log(e);
       }
     };
-    setWinHeight(window.innerHeight)
-    setItemsPerPage(calculateItemsPerPage(winHeight))
+    setWinHeight(window.innerHeight);
+    setItemsPerPage(calculateItemsPerPage(winHeight));
     getNOfTransactions();
-  },[]);
+  }, []);
 
   React.useEffect(() => {
     const getTransactions = async () => {
       try {
         const res = await axios.get(
-          BACKEND_URL+`/history?page=${page}&items=${itemsPerPage}`,
+          BACKEND_URL + `/history?page=${page}&items=${itemsPerPage}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -78,7 +72,6 @@ const HistoryPage = () => {
     setPage(value);
   };
 
-
   return (
     <div style={{ minHeight: "90vh" }}>
       <div
@@ -92,17 +85,29 @@ const HistoryPage = () => {
       >
         <NavBar active="History" />
         <h1 style={subtitleStyle}>Your history</h1>
-        <TransactionsTable transactions={transactions} />
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <Pagination
-            style={{
-              position: "absolute",
-              bottom: 10,
-            }}
-            count={itemsPerPage==0 ? 0 : Math.ceil(nOfTransactions / itemsPerPage)}
-            onChange={handleChange}
-          />
-        </div>
+        {transactions.length > 0 ? (
+          <>
+            <TransactionsTable transactions={transactions} />
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Pagination
+                style={{
+                  position: "absolute",
+                  bottom: 10,
+                }}
+                count={
+                  itemsPerPage == 0
+                    ? 0
+                    : Math.ceil(nOfTransactions / itemsPerPage)
+                }
+                onChange={handleChange}
+              />
+            </div>
+          </>
+        ) : (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <h1 style={textStyle}>No transactions yet.</h1>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -117,8 +122,10 @@ const subtitleStyle = {
   marginTop: "50px",
 };
 
-const itemsContainer = {
-  backgroundColor: "violet",
-  marginLeft: "70px",
-  marginRight: "70px",
+const textStyle = {
+  fontFamily: "system-ui",
+  fontWeight: 300,
+  fontSize: "25px",
+  marginTop: "50px",
+  color: "#585858",
 };

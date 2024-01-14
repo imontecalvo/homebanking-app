@@ -6,12 +6,14 @@ En caso de ser la primera vez que desees ejecutarlo y no tengas los componentes 
 ```
 sudo docker compose up --build
 ```
+Luego acceder a http://localhost:3000
 
 ### Ejecución
 En caso de ya tener creados los componentes no es necesario realizar el `build` de nuevo, simplemente se puede ejecutar con el comando:
 ```
 sudo docker compose up
 ```
+Luego acceder a http://localhost:3000
 
 ## Ejecución sin Docker
 En caso de querer ejecutar de forma local sin usar Docker, los pasos son los siguientes:
@@ -31,6 +33,7 @@ En caso de querer ejecutar de forma local sin usar Docker, los pasos son los sig
     #Correr frontend, estando en ./client
     npm start 
     ```
+8. Luego acceder a http://localhost:3000
     
 ## Información útil
 - El servidor del frontend (servidor serve) corre en el puerto `3000` (en host y en el contenedor de docker)

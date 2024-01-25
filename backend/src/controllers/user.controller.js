@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import Balance from "../models/Balance.js";
 import { createAccessToken } from "../jwt.js";
+import bcrypt from "bcrypt";
 
 // Crea el balance inicial del usuario
 // El balance inicial de la moneda del usuario es 2000, el resto es 0
@@ -33,7 +34,8 @@ export const createUser = async (req, res) => {
     }
 
     //Crear usuario
-    const user = await User.create({ username, password });
+    const user_password = bcrypt.hashSync(password, 10);
+    const user = await User.create({ username, password:user_password });
     initialize_balance(user.user_id, currency);
     return res.status(201).json({ msg: user, ok: true });
   } catch (error) {
@@ -66,7 +68,8 @@ export const loginUser = async (req, res) => {
     }
 
     //Chequear si la contraseña es correcta
-    if (password !== user.password) {
+    const pwdMatching = bcrypt.compareSync(password, user.password);
+    if (!pwdMatching){
       await User.update(
         { login_failed: user.login_failed + 1 },
         { where: { username } }

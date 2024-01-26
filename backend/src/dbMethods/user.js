@@ -39,6 +39,10 @@ export const newBalance = async (user_id, currency, amount) => {
   await Balance.create({ user_id, currency, amount });
 };
 
+export const getBalance = async (user_id, currency) => {
+  return await Balance.findOne({ where: { user_id, currency } });
+};
+
 export const getAllUserBalance = async (user_id) => {
   return await Balance.findAll({
     where: { user_id },

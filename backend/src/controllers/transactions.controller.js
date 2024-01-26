@@ -17,32 +17,22 @@ export const newDeposit = async (req, res) => {
     return res.status(400).json({ msg: "Invalid amount", ok: false });
   }
 
+  const db = req.app.db;
+
   try {
     //Chequear si existe usuario
-    if (!(await User.findOne({ where: { user_id } }))) {
+    if (!(await db.user.existUserById(user_id))) {
       return res.status(400).json({ msg: "User not found", ok: false });
     }
 
     //Chequear si existe balance
-    const balance = await Balance.findOne({ where: { user_id, currency } });
+    const balance = await db.user.getBalance(user_id, currency);
     if (!balance) {
       return res.status(400).json({ msg: "Invalid currency", ok: false });
     }
 
-    //Actualizar balance
-    const newAmount = balance.amount + amount;
-    await Balance.update(
-      { amount: newAmount },
-      { where: { user_id, currency } }
-    );
-
-    await Transaction.create({
-      user_id,
-      type: "Deposit",
-      currency,
-      amount,
-      date: new Date().toISOString(),
-    });
+    //Actualizar balance y registro deposito
+    await db.transaction.newDeposit(user_id, amount, currency);
 
     return res.status(201).json({ msg: "Deposit successful", ok: true });
   } catch (error) {
@@ -66,14 +56,16 @@ export const newWithdraw = async (req, res) => {
     return res.status(400).json({ msg: "Invalid amount", ok: false });
   }
 
+  const db = req.app.db;
+
   try {
     //Chequear si existe usuario
-    if (!(await User.findOne({ where: { user_id } }))) {
+    if (!(await db.user.existUserById(user_id))) {
       return res.status(400).json({ msg: "User not found", ok: false });
     }
 
     //Chequear si existe balance
-    const balance = await Balance.findOne({ where: { user_id, currency } });
+    const balance = await db.user.getBalance(user_id, currency);
     if (!balance) {
       return res.status(400).json({ msg: "Invalid currency", ok: false });
     }
@@ -83,20 +75,8 @@ export const newWithdraw = async (req, res) => {
       return res.status(400).json({ msg: "Insufficient funds", ok: false });
     }
 
-    //Actualizar balance
-    const newAmount = balance.amount - amount;
-    await Balance.update(
-      { amount: newAmount },
-      { where: { user_id, currency } }
-    );
-
-    await Transaction.create({
-      user_id,
-      type: "Withdraw",
-      currency,
-      amount,
-      date: new Date().toISOString(),
-    });
+    //Actualizar balance y registra el retiro
+    await db.transaction.newWithdraw(user_id, amount, currency);
 
     return res.status(201).json({ msg: "Withdraw successful", ok: true });
   } catch (error) {
@@ -120,25 +100,24 @@ export const newTransfer = async (req, res) => {
     return res.status(400).json({ msg: "Invalid amount", ok: false });
   }
 
+  const db = req.app.db;
+
   try {
     //Chequear si existe usuario
-    if (!(await User.findOne({ where: { user_id } }))) {
+    if (!(await db.user.existUserById(user_id))) {
       return res.status(400).json({ msg: "User not found", ok: false });
     }
 
     //Chequear si existe usuario destino
-    const destUserID = await User.findOne({
-      where: { username: destUsername },
-      attributes: ["user_id"],
-    });
-    if (!destUserID) {
+    const destUser = await db.user.getUser(destUsername);
+    if (!destUser) {
       return res
         .status(400)
         .json({ msg: "Destionation user not found", ok: false });
     }
 
     //Chequear si existe balance
-    const balance = await Balance.findOne({ where: { user_id, currency } });
+    const balance = await db.user.getBalance(user_id, currency);
     if (!balance) {
       return res.status(400).json({ msg: "Invalid currency", ok: false });
     }
@@ -148,39 +127,13 @@ export const newTransfer = async (req, res) => {
       return res.status(400).json({ msg: "Insufficient funds", ok: false });
     }
 
-    //Actualizar balance origen
-    const newAmount = balance.amount - amount;
-    await Balance.update(
-      { amount: newAmount },
-      { where: { user_id, currency } }
-    );
-
-    //Actualizar balance destino
-    const destBalance = await Balance.findOne({
-      where: { user_id: destUserID.user_id, currency },
-    });
-    const newDestAmount = destBalance.amount + amount;
-    await Balance.update(
-      { amount: newDestAmount },
-      { where: { user_id: destUserID.user_id, currency } }
-    );
-
-    //Crear transferencia en ambos usuarios
-    await Transaction.create({
+    await db.transaction.newTransfer(
       user_id,
-      type: "Transfer",
-      currency,
-      amount: -amount,
-      date: new Date().toISOString(),
-    });
-
-    await Transaction.create({
-      user_id: destUserID.user_id,
-      type: "Transfer",
-      currency,
+      destUser.user_id,
       amount,
-      date: new Date().toISOString(),
-    });
+      currency
+    );
+
     return res.status(201).json({ msg: "Withdraw successful", ok: true });
   } catch (error) {
     console.log(error);

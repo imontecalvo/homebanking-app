@@ -1,50 +1,16 @@
 import request from "supertest";
-import { jest } from "@jest/globals";
 import App from "../src/app.js";
-import db from "./utilsTests.js";
-import bcrypt from "bcrypt";
+import db from "./dbMock.js";
+import {
+  currencies,
+  successNewUserBody,
+  newUser,
+  successLoginBody,
+  getUser,
+  allUserBalances,
+} from "./utilsTests.js";
 
 const app = App(db);
-
-const currencies = ["USD", "CLP", "ARS", "GBP", "TRY", "EUR"];
-
-const successNewUserBody = {
-  username: "usuarioMock",
-  password: "passwordMock",
-  confirmPassword: "passwordMock",
-  currency: "USD",
-};
-const newUser = {
-  user_id: 1,
-  username: "usuarioMock",
-  password: "passwordMock",
-};
-
-const successLoginBody = {
-  username: "usuarioMock",
-  password: "passwordMock",
-};
-
-const getUser = {
-  user_id: 1,
-  username: "usuarioMock",
-  password: bcrypt.hashSync("passwordMock", 10),
-  login_failed: 0,
-  user_currency: "USD",
-};
-
-export const loggedUser = {
-  user_id: 1,
-  username: "usuarioMock",
-};
-
-const balance = {
-  user_id: 1,
-  user_currency: "USD",
-  balance: 1000,
-};
-
-const AllUserBalance = [balance];
 
 describe("Register", () => {
   // Resetear mocks
@@ -236,14 +202,14 @@ describe("Balance", () => {
 
   test("balance - exito", async () => {
     db.user.existUserById.mockResolvedValue(true);
-    db.user.getAllUserBalance.mockResolvedValue(AllUserBalance);
+    db.user.getAllUserBalance.mockResolvedValue(allUserBalances);
 
     const response = await request(app).get("/users/balance");
 
     expect(response.statusCode).toBe(200);
     expect(db.user.getAllUserBalance.mock.calls.length).toBe(1);
     expect(db.user.existUserById.mock.calls.length).toBe(1);
-    expect(response.body.msg).toEqual(AllUserBalance);
+    expect(response.body.msg).toEqual(allUserBalances);
   });
 
   test("balance - usuario no existe", async () => {

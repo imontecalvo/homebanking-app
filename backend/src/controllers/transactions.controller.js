@@ -67,6 +67,7 @@ export const newWithdraw = async (req, res) => {
     }
 
     //Chequear si hay fondos suficientes
+    console.log("balance: ", balance.amount, " monto: ", amount);
     if (balance.amount < amount) {
       return res.status(400).json({ msg: "Insufficient funds", ok: false });
     }
@@ -109,7 +110,7 @@ export const newTransfer = async (req, res) => {
     if (!destUser) {
       return res
         .status(400)
-        .json({ msg: "Destionation user not found", ok: false });
+        .json({ msg: "Destination user not found", ok: false });
     }
 
     //Chequear si existe balance
@@ -130,7 +131,7 @@ export const newTransfer = async (req, res) => {
       currency
     );
 
-    return res.status(201).json({ msg: "Withdraw successful", ok: true });
+    return res.status(201).json({ msg: "Transfer successful", ok: true });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Server error", ok: false });

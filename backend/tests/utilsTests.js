@@ -1,28 +1,56 @@
-import { jest } from "@jest/globals";
+import bcrypt from "bcrypt";
 
-const db = {
-  user: {
-    existUser: jest.fn(),
-    existUserById: jest.fn(),
-    newUser: jest.fn(),
-    getUser: jest.fn(),
-    newLoginFailed: jest.fn(),
-    newLoginFailed: jest.fn(),
-    newLoginSuccess: jest.fn(),
-    newBalance: jest.fn(),
-    getBalance: jest.fn(),
-    getAllUserBalance: jest.fn(),
-  },
-  exchange: {
-    newExchange: jest.fn(),
-  },
-  transaction: {
-    newDeposit: jest.fn(),
-    newWithdraw: jest.fn(),
-    newTransfer: jest.fn(),
-    getHistoryPaginated: jest.fn(),
-    getNOfTransactions: jest.fn(),
-  },
+export const currencies = ["USD", "CLP", "ARS", "GBP", "TRY", "EUR"];
+
+export const successNewUserBody = {
+  username: "usuarioMock",
+  password: "passwordMock",
+  confirmPassword: "passwordMock",
+  currency: "USD",
+};
+export const newUser = {
+  user_id: 1,
+  username: "usuarioMock",
+  password: "passwordMock",
 };
 
-export default db;
+export const successLoginBody = {
+  username: "usuarioMock",
+  password: "passwordMock",
+};
+
+export const getUser = {
+  user_id: 1,
+  username: "usuarioMock",
+  password: bcrypt.hashSync("passwordMock", 10),
+  login_failed: 0,
+  user_currency: "USD",
+};
+
+export const loggedUser = {
+  user_id: 1,
+  username: "usuarioMock",
+};
+
+export const balance = {
+  currency: "USD",
+  amount: 1000,
+};
+
+export const allUserBalances = [balance];
+
+export const newDepositBody = {
+  currency: "USD",
+  amount: 100,
+};
+
+export const newWithdrawBody = {
+  currency: "USD",
+  amount: 100,
+};
+
+export const newTransferBody = {
+  currency: "USD",
+  amount: 100,
+  destUsername: "usuarioMock2",
+};

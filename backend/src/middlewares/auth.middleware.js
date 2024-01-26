@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { TOKEN_KEY } from "../constants.js";
-import { loggedUser } from "../../tests/user.test.js";
+import { loggedUser } from "../../tests/utilsTests.js";
 
 // Middleware para verificar el token
 // Si no existe o es invalido, se devuelve error 401

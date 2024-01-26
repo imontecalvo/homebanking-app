@@ -1,9 +1,12 @@
-import app from "./app.js";
+import App from "./app.js";
 import { sequelize } from "./db.js";
 import { config } from "dotenv";
+import database from "./dbMethods/database.js";
+
 config();
 
 async function main() {
+  let app = App(database);
   try {
     await sequelize.sync();
     app.listen(process.env.API_LOCAL_PORT, () => {

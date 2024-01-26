@@ -1,6 +1,3 @@
-import User from "../models/User.js";
-import Balance from "../models/Balance.js";
-
 const FEE = 0.01;
 
 // Recibe moneda de origen, monto y moneda de destino
@@ -42,16 +39,16 @@ export const newExchange = async (req, res) => {
     return res.status(400).json({ msg: "Invalid amount", ok: false });
   }
 
+  const db = req.app.db;
+
   try {
     //Chequear si existe usuario
-    if (!(await User.findOne({ where: { user_id } }))) {
+    if (!(await db.user.existUserById(user_id))) {
       return res.status(400).json({ msg: "User not found", ok: false });
     }
 
     //Chequear si existe balance
-    const balance = await Balance.findOne({
-      where: { user_id, currency: origin_currency },
-    });
+    const balance = await db.user.getBalance(user_id, origin_currency);
     if (!balance) {
       return res.status(400).json({ msg: "Invalid currency", ok: false });
     }
@@ -61,24 +58,18 @@ export const newExchange = async (req, res) => {
       return res.status(400).json({ msg: "Insufficient funds", ok: false });
     }
 
-    //Actualizar balance origen
-    const newAmount = balance.amount - origin_amount;
-    await Balance.update(
-      { amount: newAmount },
-      { where: { user_id, currency: origin_currency } }
+    const destiny_amount = exchangeWithFee(
+      origin_amount,
+      origin_currency,
+      destiny_currency
     );
 
-    //Actualizar balance destino
-    const balanceDest = await Balance.findOne({
-      where: { user_id, currency: destiny_currency },
-    });
-    const newAmountDest =
-      balanceDest.amount +
-      exchangeWithFee(origin_amount, origin_currency, destiny_currency);
-
-    await Balance.update(
-      { amount: newAmountDest },
-      { where: { user_id, currency: destiny_currency } }
+    await db.exchange.newExchange(
+      user_id,
+      origin_currency,
+      origin_amount,
+      destiny_currency,
+      destiny_amount
     );
 
     return res.status(201).json({ msg: "Withdraw successful", ok: true });

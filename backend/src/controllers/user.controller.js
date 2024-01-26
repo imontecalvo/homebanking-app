@@ -1,17 +1,15 @@
-import User from "../models/User.js";
-import Balance from "../models/Balance.js";
 import { createAccessToken } from "../jwt.js";
 import bcrypt from "bcrypt";
 
 // Crea el balance inicial del usuario
 // El balance inicial de la moneda del usuario es 2000, el resto es 0
-const initialize_balance = async (user_id, user_currency) => {
+const initialize_balance = async (user_id, user_currency, db) => {
   const currencies = ["USD", "CLP", "ARS", "GBP", "TRY", "EUR"];
   const INIT_BALANCE = 2000;
 
   currencies.forEach(async (currency) => {
     const balance = currency == user_currency ? INIT_BALANCE : 0;
-    await Balance.create({ user_id, currency, amount: balance });
+    await db.user.newBalance(user_id, currency, balance);
   });
 };
 
@@ -27,16 +25,18 @@ export const createUser = async (req, res) => {
     return res.status(400).json({ msg: "Passwords don't match", ok: false });
   }
 
+  const db = req.app.db;
+
   try {
     //Chequear si existe usuario
-    if (await User.findOne({ where: { username } })) {
+    if (await db.user.existUser(username)) {
       return res.status(400).json({ msg: "Username already taken", ok: false });
     }
 
     //Crear usuario
     const user_password = bcrypt.hashSync(password, 10);
-    const user = await User.create({ username, password:user_password });
-    initialize_balance(user.user_id, currency);
+    const user = await db.user.newUser(username, user_password);
+    initialize_balance(user.user_id, currency, db);
     return res.status(201).json({ msg: user, ok: true });
   } catch (error) {
     console.log(error);
@@ -53,9 +53,11 @@ export const loginUser = async (req, res) => {
     return res.status(400).json({ msg: "Missing fields", ok: false });
   }
 
+  const db = req.app.db;
+
   try {
     //Chequear si existe usuario
-    const user = await User.findOne({ where: { username } });
+    const user = await db.user.getUser(username);
     if (!user) {
       return res.status(400).json({ msg: "User not found", ok: false });
     }
@@ -69,11 +71,8 @@ export const loginUser = async (req, res) => {
 
     //Chequear si la contraseña es correcta
     const pwdMatching = bcrypt.compareSync(password, user.password);
-    if (!pwdMatching){
-      await User.update(
-        { login_failed: user.login_failed + 1 },
-        { where: { username } }
-      );
+    if (!pwdMatching) {
+      await db.user.newLoginFailed(user.user_id);
       //Si ya tenia previamente 2 intentos fallidos, se bloquea la cuenta al ser este el tercero
       if (user.login_failed == 2) {
         return res
@@ -85,7 +84,7 @@ export const loginUser = async (req, res) => {
     }
 
     //Si la contraseña es correcta, se resetea el contador de intentos fallidos
-    await User.update({ login_failed: 0 }, { where: { username } });
+    await db.user.newLoginSuccess(user.user_id);
 
     //Se crea el token y se devuelve
     const token = await createAccessToken({
@@ -106,16 +105,15 @@ export const loginUser = async (req, res) => {
 export const getUserBalance = async (req, res) => {
   const { user_id } = req.user;
 
+  const db = req.app.db;
+
   try {
-    const user = await User.findOne({ where: { user_id } });
-    if (!user) {
+    if (!await db.user.existUserById(user_id)) {
       return res.status(400).json({ msg: "User not found", ok: false });
     }
 
-    const balance = await Balance.findAll({
-      where: { user_id },
-      attributes: ["currency", "amount"],
-    });
+    const balance = await db.user.getAllUserBalance(user_id);
+
     return res.status(200).json({ msg: balance, ok: true });
   } catch (error) {
     console.log(error);

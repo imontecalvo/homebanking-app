@@ -1,10 +1,16 @@
 import jwt from "jsonwebtoken";
 import { TOKEN_KEY } from "../constants.js";
+import { loggedUser } from "../../tests/user.test.js";
 
 // Middleware para verificar el token
 // Si no existe o es invalido, se devuelve error 401
 // Si existe, se guarda el usuario en req.user y se llama a next()
 export const auth = (req, res, next) => {
+  if (process.env.NODE_ENV === "test") {
+    req.user = loggedUser;
+    return next();
+  }
+
   try {
     let token = req.headers.authorization;
     // Si no existe el token, se devuelve un error

@@ -1,7 +1,3 @@
-import User from "../models/User.js";
-import Balance from "../models/Balance.js";
-import Transaction from "../models/Transaction.js";
-
 // Se obtiene la moneda y el monto desde el body
 // Se realiza un deposito actualizando el balance del usuario en caso de exito
 export const newDeposit = async (req, res) => {

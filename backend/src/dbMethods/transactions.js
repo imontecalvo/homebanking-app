@@ -31,7 +31,12 @@ export const newWithdraw = async (user_id, amount, currency) => {
   });
 };
 
-export const newTransfer = async (originUser_id, destUser_id, amount, currency) => {
+export const newTransfer = async (
+  originUser_id,
+  destUser_id,
+  amount,
+  currency
+) => {
   //Actualizar balance origen
   const originBalance = await Balance.findOne({
     where: { user_id: originUser_id, currency },
@@ -62,4 +67,17 @@ export const newTransfer = async (originUser_id, destUser_id, amount, currency) 
     amount,
     date: new Date().toISOString(),
   });
+};
+
+export const getHistoryPaginated = async (user_id, limit, offset, order) => {
+  return await Transaction.findAll({
+    where: { user_id },
+    limit,
+    offset,
+    order,
+  });
+};
+
+export const getNOfTransactions = async (user_id) => {
+  return await Transaction.count({ where: { user_id } });
 };

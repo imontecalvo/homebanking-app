@@ -54,3 +54,9 @@ export const newTransferBody = {
   amount: 100,
   destUsername: "usuarioMock2",
 };
+
+export const successNewExchangeBody = {
+  origin_currency: "USD",
+  origin_amount: 100,
+  destiny_currency: "ARS",
+};

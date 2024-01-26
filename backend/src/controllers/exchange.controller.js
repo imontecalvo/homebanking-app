@@ -35,7 +35,7 @@ export const newExchange = async (req, res) => {
     return res.status(400).json({ msg: "Missing fields", ok: false });
   }
 
-  if (origin_currency <= 0) {
+  if (origin_amount <= 0) {
     return res.status(400).json({ msg: "Invalid amount", ok: false });
   }
 

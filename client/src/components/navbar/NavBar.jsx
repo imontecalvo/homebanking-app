@@ -1,7 +1,7 @@
 import * as React from "react";
 import { AppBar, Tabs, Tab, Container, Button } from "@mui/material";
 import Box from "@mui/material/Box";
-import navbar_style from "./navbar_style.css";
+import "./navbar_style.css";
 import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 

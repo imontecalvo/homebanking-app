@@ -1,4 +1,4 @@
-import register_style from "./register_style.css";
+import "./register_style.css";
 import * as React from "react";
 import TextField from "@mui/material/TextField";
 import Container from "@mui/material/Container";
@@ -12,9 +12,9 @@ import CurrencyList from "../../components/CurrencyList";
 
 import MuiAlert from "@mui/material/Alert";
 
+import {BACKEND_URL} from "../../constants.js"
 // import {config} from "dotenv";
 // config();
-import {BACKEND_URL} from "../../constants.js"
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;

@@ -1,13 +1,13 @@
 import * as React from "react";
 import NavBar from "../../components/navbar/NavBar";
-import home_style from "./home_style.css";
+import "./home_style.css";
 import { LocalConvenienceStoreOutlined, Subtitles } from "@mui/icons-material";
 import CurrencyBalance from "../../components/currency_balance/CurrencyBalance";
 import axios from "axios";
 
+import {BACKEND_URL} from "../../constants.js"
 // import {config} from "dotenv";
 // config();
-import {BACKEND_URL} from "../../constants.js"
 
 const HomePage = () => {
   const username = localStorage.getItem("username");

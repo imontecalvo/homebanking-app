@@ -7,9 +7,9 @@ import NumberInput from "../../components/NumericInput";
 
 import axios from "axios";
 
+import {BACKEND_URL} from "../../constants.js"
 // import {config} from "dotenv";
 // config();
-import {BACKEND_URL} from "../../constants.js"
 
 export const DepositContent = ({ onClose, showSnackBar }) => {
   const [currency, setCurrency] = React.useState("");

@@ -1,4 +1,4 @@
-import transaction_type_card_css from "./transaction_type_card.css";
+import "./transaction_type_card.css";
 import depositImg from "./../../public/deposit_icon.png";
 import transferImg from "./../../public/transfer_icon.png";
 import withdrawImg from "./../../public/withdraw_icon.png";

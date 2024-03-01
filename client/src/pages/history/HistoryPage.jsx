@@ -5,10 +5,10 @@ import Pagination from "@mui/material/Pagination";
 
 import TransactionsTable from "../../components/TransactionsTable";
 
+import { BACKEND_URL } from "../../constants";
 // import {config} from "dotenv";
 // config();
 
-import { BACKEND_URL } from "../../constants";
 
 const HistoryPage = () => {
   const token = localStorage.getItem("token");

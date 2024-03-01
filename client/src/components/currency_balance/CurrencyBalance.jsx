@@ -1,4 +1,4 @@
-import container_style from "./container_style.css";
+import "./container_style.css";
 
 const CurrencyBalance = ({ currency, balance, flag, symbol }) => (
   <div className="container">

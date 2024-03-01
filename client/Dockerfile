@@ -2,9 +2,9 @@ FROM node:20.10.0
 
 WORKDIR /client
 RUN npm install -g serve
-RUN mkdir build
-COPY ./build ./build
+RUN mkdir dist
+COPY ./dist ./dist
 
 EXPOSE 3000
 
-CMD serve -s build
+CMD serve -s dist

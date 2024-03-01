@@ -4,7 +4,7 @@ import TransactionTypeCard from "../../components/transaction_type_card/Transact
 import Modal from "@mui/material/Modal";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
-import transactions_style from "./transactions_style.css";
+import "./transactions_style.css";
 
 import {
   DepositContent,

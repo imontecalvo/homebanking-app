@@ -35,6 +35,7 @@ En caso de querer ejecutar de forma local sin usar Docker, los pasos son los sig
     npm run dev
 
     #2. Para servir el front buildeado
+    npm run build #Una vez buildeado ya no hace falta volver a correrlo
     npm install -g serve
     serve -s dist
     ```

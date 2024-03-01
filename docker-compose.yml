@@ -4,13 +4,12 @@ services:
   dbpostgres:
     image: postgres:12.17
     container_name: dbpostgres
-    env_file: ./.env
     environment:
-      - POSTGRES_USER=$DB_USERNAME
-      - POSTGRES_PASSWORD=$DB_PASSWORD
-      - POSTGRES_DB=$DB_NAME
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=homebanking
     ports:
-      - $DB_HOST_PORT:$DB_LOCAL_PORT
+      - 6000:5432
     logging:
       driver: none
 
@@ -21,17 +20,23 @@ services:
     links:
       - dbpostgres
     build: ./backend
-    env_file: ./.env
+    environment:
+      - DB_NAME=homebanking
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=admin
+      - DB_LOCAL_PORT=5432
+      - DB_HOST=dbpostgres
     ports:
-      - $API_HOST_PORT:$API_LOCAL_PORT
+      - 3001:3001
 
   frontend:
     container_name: frontend
     build: ./client
     ports:
-      - $FRONTEND_HOST_PORT:$FRONTEND_LOCAL_PORT
+      - 3000:3000
     depends_on:
       - backend
     links:
       - backend
-    env_file: ./.env
+    environment:
+      - BACKEND_URL=backend:3001

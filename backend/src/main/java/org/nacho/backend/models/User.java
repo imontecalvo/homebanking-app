@@ -1,15 +1,13 @@
 package org.nacho.backend.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name="usuarios")
 public class User {
@@ -25,4 +23,10 @@ public class User {
 
     @Column(unique = true, nullable = false)
     private String email;
+
+    public User(String username, String password, String email) {
+        this.username=username;
+        this.password=password;
+        this.email=email;
+    }
 }

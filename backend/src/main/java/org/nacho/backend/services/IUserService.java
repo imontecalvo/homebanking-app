@@ -1,9 +1,9 @@
 package org.nacho.backend.services;
 
 import org.nacho.backend.dtos.UserRegistrationDTO;
-import org.nacho.backend.exceptions.UnavailableField;
+import org.nacho.backend.exceptions.InvalidInput;
 
 public interface IUserService {
 
-    public void newUser(UserRegistrationDTO userRegistrationDTO) throws UnavailableField;
+    public void newUser(UserRegistrationDTO userRegistrationDTO) throws InvalidInput;
 }

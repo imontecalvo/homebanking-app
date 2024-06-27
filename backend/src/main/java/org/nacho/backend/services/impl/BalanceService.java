@@ -4,6 +4,7 @@ import org.nacho.backend.dtos.BalanceDTO;
 import org.nacho.backend.exceptions.ResourceNotFound;
 import org.nacho.backend.models.Balance;
 import org.nacho.backend.repositories.IBalanceRepository;
+import org.nacho.backend.repositories.IUserRepository;
 import org.nacho.backend.services.IBalanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,12 @@ public class BalanceService implements IBalanceService {
 
     @Autowired
     private IBalanceRepository balanceRepository;
+
+    @Autowired
+    private IUserRepository userRepository;
     @Override
     public List<BalanceDTO> getUserBalances(Long userId) throws ResourceNotFound {
-        if (!balanceRepository.existsById(userId)){
+        if (!userRepository.existsById(userId)){
             throw new ResourceNotFound("User does not exsit");
         }
         List<Balance> balances = balanceRepository.findAllByUserId(userId);

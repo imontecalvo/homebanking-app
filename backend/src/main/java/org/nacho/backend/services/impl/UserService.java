@@ -1,7 +1,7 @@
 package org.nacho.backend.services.impl;
 
 import org.nacho.backend.dtos.UserRegistrationDTO;
-import org.nacho.backend.exceptions.UnavailableField;
+import org.nacho.backend.exceptions.InvalidInput;
 import org.nacho.backend.models.Balance;
 import org.nacho.backend.models.Currency;
 import org.nacho.backend.models.User;
@@ -25,11 +25,11 @@ public class UserService implements IUserService {
     private final BigDecimal INIT_BALANCE = BigDecimal.valueOf(2000);
 
     @Override
-    public void newUser(UserRegistrationDTO userRegistrationDTO) throws UnavailableField {
+    public void newUser(UserRegistrationDTO userRegistrationDTO) throws InvalidInput {
         if (userRepository.existsByUsername(userRegistrationDTO.getUsername())) {
-            throw new UnavailableField("Username already exists");
+            throw new InvalidInput("Username already exists");
         } else if (userRepository.existsByEmail(userRegistrationDTO.getEmail())) {
-            throw new UnavailableField("Email already exists");
+            throw new InvalidInput("Email already exists");
         }
 
         User user = User.builder()

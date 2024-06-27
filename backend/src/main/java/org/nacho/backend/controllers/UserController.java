@@ -1,7 +1,7 @@
 package org.nacho.backend.controllers;
 
 import org.nacho.backend.dtos.UserRegistrationDTO;
-import org.nacho.backend.exceptions.UnavailableField;
+import org.nacho.backend.exceptions.InvalidInput;
 import org.nacho.backend.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class UserController {
     private IUserService userService;
 
     @PostMapping("")
-    public ResponseEntity<?> newUser(@RequestBody UserRegistrationDTO userRegistrationDTO) throws UnavailableField {
+    public ResponseEntity<?> newUser(@RequestBody UserRegistrationDTO userRegistrationDTO) throws InvalidInput {
         userService.newUser(userRegistrationDTO);
         return ResponseEntity.status(201).body("User created successfully");
     }

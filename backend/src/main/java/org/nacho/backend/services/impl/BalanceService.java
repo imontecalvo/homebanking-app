@@ -1,16 +1,17 @@
-package org.nacho.backend.services;
+package org.nacho.backend.services.impl;
 
 import org.nacho.backend.dtos.BalanceDTO;
 import org.nacho.backend.exceptions.ResourceNotFound;
 import org.nacho.backend.models.Balance;
 import org.nacho.backend.repositories.IBalanceRepository;
+import org.nacho.backend.services.IBalanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class BalanceService implements IBalanceService{
+public class BalanceService implements IBalanceService {
 
     @Autowired
     private IBalanceRepository balanceRepository;

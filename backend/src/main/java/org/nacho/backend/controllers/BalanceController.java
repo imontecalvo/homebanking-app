@@ -25,5 +25,4 @@ public class BalanceController {
         List<BalanceDTO> balances = balanceService.getUserBalances(id);
         return ResponseEntity.status(200).body(balances);
     }
-
 }

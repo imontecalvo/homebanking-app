@@ -2,10 +2,16 @@ package org.nacho.backend.models;
 
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
 @Entity
 @Table(name="transacciones")
 public class Transaction {

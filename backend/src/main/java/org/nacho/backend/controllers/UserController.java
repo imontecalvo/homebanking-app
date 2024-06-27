@@ -19,7 +19,7 @@ public class UserController {
 
     @PostMapping("")
     public ResponseEntity<?> newUser(@RequestBody UserRegistrationDTO userRegistrationDTO) throws UnavailableField {
-        userService.createUser(userRegistrationDTO);
+        userService.newUser(userRegistrationDTO);
         return ResponseEntity.status(201).body("User created successfully");
     }
 }

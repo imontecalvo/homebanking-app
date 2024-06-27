@@ -1,4 +1,4 @@
-package org.nacho.backend.services;
+package org.nacho.backend.services.impl;
 
 import org.nacho.backend.dtos.UserRegistrationDTO;
 import org.nacho.backend.exceptions.UnavailableField;
@@ -7,6 +7,7 @@ import org.nacho.backend.models.Currency;
 import org.nacho.backend.models.User;
 import org.nacho.backend.repositories.IBalanceRepository;
 import org.nacho.backend.repositories.IUserRepository;
+import org.nacho.backend.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class UserService implements IUserService {
     private final BigDecimal INIT_BALANCE = BigDecimal.valueOf(2000);
 
     @Override
-    public void createUser(UserRegistrationDTO userRegistrationDTO) throws UnavailableField {
+    public void newUser(UserRegistrationDTO userRegistrationDTO) throws UnavailableField {
         if (userRepository.existsByUsername(userRegistrationDTO.getUsername())) {
             throw new UnavailableField("Username already exists");
         } else if (userRepository.existsByEmail(userRegistrationDTO.getEmail())) {

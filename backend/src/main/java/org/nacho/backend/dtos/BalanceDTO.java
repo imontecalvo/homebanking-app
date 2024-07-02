@@ -1,9 +1,8 @@
 package org.nacho.backend.dtos;
 
-import jakarta.persistence.*;
 import lombok.Data;
 import org.nacho.backend.models.Currency;
-import org.nacho.backend.models.User;
+import org.nacho.backend.models.UserEntity;
 
 import java.math.BigDecimal;
 
@@ -13,7 +12,7 @@ public class BalanceDTO {
     private BigDecimal amount;
     private Long userId;
 
-    public BalanceDTO(Currency currency, BigDecimal amount, User user) {
+    public BalanceDTO(Currency currency, BigDecimal amount, UserEntity user) {
         this.currency = currency;
         this.amount = amount;
         this.userId = user.getId();

@@ -7,8 +7,8 @@ import org.nacho.backend.exceptions.ResourceNotFound;
 import org.nacho.backend.exceptions.InvalidInput;
 
 public interface ITransactionService {
-    void newDeposit(SimpleTransactionDTO depositDTO, Long userId) throws ResourceNotFound, InvalidInput;
-    void newWithdraw(SimpleTransactionDTO withdrawDTO, Long userId) throws ResourceNotFound, InvalidInput;
-    void newTransfer(TransferDTO transferDTO, Long userId) throws ResourceNotFound, InvalidInput;
-    void newExchange(ExchangeDTO exchangeDTO, Long userId) throws ResourceNotFound, InvalidInput;
+    void newDeposit(SimpleTransactionDTO depositDTO) throws ResourceNotFound, InvalidInput;
+    void newWithdraw(SimpleTransactionDTO withdrawDTO) throws ResourceNotFound, InvalidInput;
+    void newTransfer(TransferDTO transferDTO) throws ResourceNotFound, InvalidInput;
+    void newExchange(ExchangeDTO exchangeDTO) throws ResourceNotFound, InvalidInput;
 }

@@ -1,4 +1,4 @@
-package org.nacho.backend;
+package org.nacho.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -7,5 +7,5 @@ import org.nacho.backend.models.Balance;
 import java.util.List;
 
 public interface IBalanceService {
-    List<BalanceDTO> getUserBalances(Long userId) throws ResourceNotFound;
+    List<BalanceDTO> getUserBalances() throws ResourceNotFound;
 }

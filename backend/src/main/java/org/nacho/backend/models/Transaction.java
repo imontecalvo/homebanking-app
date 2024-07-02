@@ -1,7 +1,6 @@
 package org.nacho.backend.models;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -19,9 +18,11 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="tipo", nullable = false)
     private TransactionType type;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="moneda", nullable = false)
     private Currency currency;
 
@@ -33,5 +34,5 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")
-    User user;
+    UserEntity user;
 }

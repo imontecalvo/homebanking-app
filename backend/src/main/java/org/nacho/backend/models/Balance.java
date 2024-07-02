@@ -19,6 +19,7 @@ public class Balance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="moneda", nullable = false)
     private Currency currency;
 
@@ -27,9 +28,9 @@ public class Balance {
 
     @ManyToOne
     @JoinColumn(name="id_usuario", nullable = false)
-    private User user;
+    private UserEntity user;
 
-    public Balance(Currency currency, BigDecimal amount, User user) {
+    public Balance(Currency currency, BigDecimal amount, UserEntity user) {
         this.currency = currency;
         this.amount = amount;
         this.user = user;

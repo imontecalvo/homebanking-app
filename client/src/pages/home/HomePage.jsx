@@ -1,17 +1,11 @@
 import * as React from "react";
 import NavBar from "../../components/navbar/NavBar";
 import "./home_style.css";
-import { LocalConvenienceStoreOutlined, Subtitles } from "@mui/icons-material";
 import CurrencyBalance from "../../components/currency_balance/CurrencyBalance";
-import axios from "axios";
-
-import {BACKEND_URL} from "../../constants.js"
-// import {config} from "dotenv";
-// config();
+import * as balanceService from "../../services/balance";
 
 const HomePage = () => {
   const username = localStorage.getItem("username");
-  const token = localStorage.getItem("token");
 
   const [balances, setBalances] = React.useState([]);
   const symbols = {
@@ -26,13 +20,9 @@ const HomePage = () => {
   React.useEffect(() => {
     const getBalances = async () => {
       try {
-        const res = await axios.get(BACKEND_URL+`/users/balance`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const unsorted_balances = res.data.msg.map((balance) => {
+        const res = await balanceService.getUserBalances()
+        
+        const unsorted_balances = res.data.map((balance) => {
           return [balance.currency, balance.amount];
         });
 

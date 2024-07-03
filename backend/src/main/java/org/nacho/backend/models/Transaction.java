@@ -1,0 +1,38 @@
+package org.nacho.backend.models;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
+@Entity
+@Table(name="transacciones")
+public class Transaction {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="tipo", nullable = false)
+    private TransactionType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="moneda", nullable = false)
+    private Currency currency;
+
+    @Column(name="monto", nullable = false)
+    private BigDecimal amount;
+
+    @Column(name = "fecha", nullable = false)
+    private Date date;
+
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    UserEntity user;
+}

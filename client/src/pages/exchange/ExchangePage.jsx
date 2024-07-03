@@ -4,15 +4,10 @@ import NumberInput from "../../components/NumericInput";
 import { Button } from "@mui/material";
 import CurrencyList from "../../components/CurrencyList";
 import { TextField } from "@mui/material";
-import axios from "axios";
-
-
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import { BACKEND_URL } from "../../constants.js";
 
-// import {config} from "dotenv";
-// config();
+import * as transactionService from "../../services/transactions.js";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -55,14 +50,16 @@ const ExchangePage = () => {
       : 0;
   }
 
-  function calculateDestinyAmount() {
-    setDestinyAmount(
-      exchange(originAmount, originCurrency, destinyCurrency).toFixed(2)
-    );
+  async function calculateDestinyAmount() {
+    const calculateDestinyAmount = fieldsNotEmpty() ? await (await transactionService.convertCurrency(originAmount, originCurrency, destinyCurrency)).data.msg.toFixed(2) : 0;
+    setDestinyAmount(calculateDestinyAmount)
+      //exchange(originAmount, originCurrency, destinyCurrency).toFixed(2)
   }
 
   React.useEffect(() => {
-    calculateDestinyAmount();
+    const convert = async () => {await calculateDestinyAmount()}
+    convert();
+    
   }, [originCurrency, destinyCurrency, originAmount]);
 
   function resetFields() {
@@ -70,23 +67,11 @@ const ExchangePage = () => {
     setDestinyAmount(0.);
   }
 
-  const token = localStorage.getItem("token");
+  
 
   const confirmExchange = async () => {
     try {
-      await axios.post(
-        BACKEND_URL + "/exchange",
-        {
-          origin_currency: originCurrency,
-          origin_amount: originAmount,
-          destiny_currency: destinyCurrency,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await transactionService.exchange(originCurrency, originAmount, destinyCurrency);
 
       resetFields();
       setOpenSnackBar(true);
@@ -129,9 +114,9 @@ const ExchangePage = () => {
           <NumberInput
             aria-label="Amount"
             placeholder="Amount"
-            onChange={(event, val) => {
+            onChange={async (event, val) => {
               setOriginAmount(val);
-              calculateDestinyAmount();
+              await calculateDestinyAmount();
             }}
             value={originAmount}
             style={{ marginBottom: 10, marginLeft: 10, height: 46 }}

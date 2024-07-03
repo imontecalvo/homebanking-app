@@ -2,20 +2,12 @@ import "./login_style.css";
 
 import * as React from "react";
 import TextField from "@mui/material/TextField";
-import Container from "@mui/material/Container";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
-
-import axios from "axios";
+import * as authService from "../../services/auth.js";
 
 import MuiAlert from "@mui/material/Alert";
-
-import {BACKEND_URL} from "../../constants.js"
-
-// import {config} from "dotenv";
-// config();
-
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -49,17 +41,15 @@ const LoginForm = () => {
     }
 
     try {
-      const res = await axios.post(BACKEND_URL+"/users/login", {
-        username: username,
-        password: password,
-      });
-
-      localStorage.setItem("username", res.data.msg.username);
-      localStorage.setItem("token", res.data.msg.token);
+      console.log("login");
+      const res = await authService.login(username, password);
+      localStorage.setItem("username", res.data.username);
+      localStorage.setItem("token", res.data.token);
       navigate("/home");
     } catch (e) {
+      console.log(e)
       setOpen(true);
-      setMessage(e.response.data.msg);
+      setMessage("Invalid username or password");
     }
   };
 

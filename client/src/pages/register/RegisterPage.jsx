@@ -4,17 +4,12 @@ import TextField from "@mui/material/TextField";
 import Container from "@mui/material/Container";
 import { Button } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
-
-import axios from "axios";
-
-import { useNavigate } from "react-router-dom";
+import MuiAlert from "@mui/material/Alert";
 import CurrencyList from "../../components/CurrencyList";
 
-import MuiAlert from "@mui/material/Alert";
+import { useNavigate } from "react-router-dom";
+import * as authService from "../../services/auth.js";
 
-import {BACKEND_URL} from "../../constants.js"
-// import {config} from "dotenv";
-// config();
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -62,13 +57,7 @@ const RegisterForm = () => {
       return;
     }
     try {
-      const res = await axios.post(BACKEND_URL+"/users/register", {
-        username: username,
-        password: password,
-        confirmPassword: confirmPassword,
-        currency: currency,
-      });
-
+      await authService.register(username, password, confirmPassword, currency);
       setMessage("User created successfully!");
       setSeverity("success");
       setOpen(true);

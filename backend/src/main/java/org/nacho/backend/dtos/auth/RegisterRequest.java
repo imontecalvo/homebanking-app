@@ -10,7 +10,7 @@ import java.util.List;
 public class RegisterRequest {
     private String username;
     private String password;
-    private String email;
+    private String confirmPassword;
     private Currency currency;
     private List<RoleEnum> roles;
 }

@@ -5,32 +5,15 @@ import TextField from "@mui/material/TextField";
 import { Button } from "@mui/material";
 import NumberInput from "../../components/NumericInput";
 
-import axios from "axios";
-
-import {BACKEND_URL} from "../../constants.js"
-// import {config} from "dotenv";
-// config();
+import * as transactionService from "../../services/transactions";
 
 export const DepositContent = ({ onClose, showSnackBar }) => {
   const [currency, setCurrency] = React.useState("");
   const [amount, setAmount] = React.useState(0);
 
-  const token = localStorage.getItem("token");
-
   const handleDeposit = async () => {
     try {
-      const res = await axios.post(
-        BACKEND_URL+`/transactions/deposit`,
-        {
-          amount: amount,
-          currency: currency,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await transactionService.deposit(amount, currency);
       onClose();
       showSnackBar(res.data.msg, "success");
     } catch (e) {
@@ -83,22 +66,10 @@ export const WithdrawContent = ({ onClose, showSnackBar }) => {
   const [currency, setCurrency] = React.useState("");
   const [amount, setAmount] = React.useState(0);
 
-  const token = localStorage.getItem("token");
-
   const handleWithdraw = async () => {
     try {
-      const res = await axios.post(
-        BACKEND_URL+`/transactions/withdraw`,
-        {
-          amount: amount,
-          currency: currency,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await transactionService.withdraw(amount, currency);
+      console.log(res);
       onClose();
       showSnackBar(res.data.msg, "success");
     } catch (e) {
@@ -152,23 +123,9 @@ export const TransferContent = ({ onClose, showSnackBar }) => {
   const [amount, setAmount] = React.useState(0);
   const [username, setUsername] = React.useState("");
 
-  const token = localStorage.getItem("token");
-
   const handleTransfer = async () => {
     try {
-      const res = await axios.post(
-        BACKEND_URL+`/transactions/transfer`,
-        {
-          amount: amount,
-          currency: currency,
-          destUsername: username,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await transactionService.transfer(amount, currency, username);
       onClose();
       showSnackBar(res.data.msg, "success");
     } catch (e) {

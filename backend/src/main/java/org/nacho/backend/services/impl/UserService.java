@@ -52,15 +52,15 @@ public class UserService implements IUserService {
     @Transactional
     @Override
     public AuthResponse newUser(RegisterRequest registerRequest) throws InvalidInput {
+        if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
+            throw new InvalidInput("Passwords do not match");
+        }
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             throw new InvalidInput("Username already exists");
-        } else if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new InvalidInput("Email already exists");
         }
 
         UserEntity user = UserEntity.builder()
                 .username(registerRequest.getUsername())
-                .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .roles(getRolesFromEnums(registerRequest.getRoles()))
                 .build();

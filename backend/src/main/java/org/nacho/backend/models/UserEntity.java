@@ -25,8 +25,8 @@ public class UserEntity {
     @Column(name="contraseña", nullable = false)
     private String password;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+/*    @Column(unique = true, nullable = false)
+    private String email;*/
 
     @Column(name = "is_enabled")
     @Builder.Default
@@ -46,10 +46,4 @@ public class UserEntity {
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles = new HashSet<>();
-
-    public UserEntity(String username, String password, String email) {
-        this.username=username;
-        this.password=password;
-        this.email=email;
-    }
 }

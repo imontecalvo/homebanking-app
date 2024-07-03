@@ -1,13 +1,8 @@
 import * as React from "react";
 import NavBar from "../../components/navbar/NavBar";
-import axios from "axios";
 import Pagination from "@mui/material/Pagination";
-
 import TransactionsTable from "../../components/TransactionsTable";
-
-import { BACKEND_URL } from "../../constants";
-// import {config} from "dotenv";
-// config();
+import * as transactionService from "../../services/transactions";
 
 
 const HistoryPage = () => {
@@ -28,11 +23,7 @@ const HistoryPage = () => {
   React.useEffect(() => {
     const getNOfTransactions = async () => {
       try {
-        const res = await axios.get(BACKEND_URL + "/history/n-transactions", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await transactionService.getNOfTransactions();
         setNOfTransactions(res.data.msg);
       } catch (e) {
         console.log(e);
@@ -46,17 +37,9 @@ const HistoryPage = () => {
   React.useEffect(() => {
     const getTransactions = async () => {
       try {
-        const res = await axios.get(
-          BACKEND_URL + `/history?page=${page}&items=${itemsPerPage}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
+        const res = await transactionService.getHistory(page, itemsPerPage);
         setTransactions(
-          res.data.msg.map((t) => {
+          res.data.map((t) => {
             t.date = new Date(t.date);
             return t;
           })

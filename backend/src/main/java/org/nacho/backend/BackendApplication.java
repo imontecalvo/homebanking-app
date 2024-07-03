@@ -20,7 +20,7 @@ public class BackendApplication {
         SpringApplication.run(BackendApplication.class, args);
     }
 
-    @Bean
+   /* @Bean
     CommandLineRunner init(IRoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             Permission readPermission = Permission.builder().name("READ").build();
@@ -58,5 +58,5 @@ public class BackendApplication {
 
             roleRepository.saveAll(List.of(userRole, adminRole, invitedRole));
         };
-    }
+    }*/
 }

@@ -1,6 +1,7 @@
 package org.nacho.backend.services.impl;
 
 import jakarta.transaction.Transactional;
+import org.nacho.backend.dtos.TransactionDTO;
 import org.nacho.backend.dtos.external.ExchangeAPIResponseDTO;
 import org.nacho.backend.dtos.transactions.ExchangeDTO;
 import org.nacho.backend.dtos.transactions.SimpleTransactionDTO;
@@ -13,6 +14,9 @@ import org.nacho.backend.repositories.ITransactionRepository;
 import org.nacho.backend.repositories.IUserRepository;
 import org.nacho.backend.services.ITransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -20,8 +24,11 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.nio.file.ReadOnlyFileSystemException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService implements ITransactionService {
@@ -37,7 +44,47 @@ public class TransactionService implements ITransactionService {
 
     private static final BigDecimal EXCHANGE_FEE_RATE = BigDecimal.valueOf(0.01);
 
-    //FIXME: Refactorizar checks -> codigo repetido
+    public BigDecimal convertCurrency(Currency from, Currency to, BigDecimal amount) throws ResourceNotFound {
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!userRepository.existsByUsername(username)){
+            throw new ResourceNotFound("The user does not exist.");
+        }
+        return convert(from, to, amount);
+    }
+
+    public Long getNumberOfTransactions() throws ResourceNotFound {
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity user = userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new ResourceNotFound("The user does not exist."));
+        return transactionRepository.countByUserId(user.getId());
+    }
+    @Override
+    public List<TransactionDTO> getTransactionHistory(Integer page, Integer items) throws InvalidInput, ResourceNotFound {
+        if (page < 0 || items < 0) {
+            throw new InvalidInput("Invalid page or items.");
+        }
+
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity user = userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new ResourceNotFound("The user does not exist."));
+
+        if (items == 0){
+            return new ArrayList<TransactionDTO>();
+        }
+
+        Pageable pageable = PageRequest.of(page, items, Sort.by(Sort.Direction.DESC, "date"));
+        List<Transaction> transactions = transactionRepository.findAllByUserId(user.getId(), pageable);
+        return transactions.stream()
+                .map(transaction -> TransactionDTO.builder()
+                        .type(transaction.getType())
+                        .currency(transaction.getCurrency())
+                        .amount(transaction.getAmount())
+                        .date(transaction.getDate())
+                        .username(user.getUsername())
+                        .build()
+                ).collect(Collectors.toList());
+    }
+
     @Override
     @Transactional
     public void newDeposit(SimpleTransactionDTO depositDTO) throws ResourceNotFound, InvalidInput {

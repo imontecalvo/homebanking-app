@@ -88,10 +88,6 @@ public class TransactionService implements ITransactionService {
     @Override
     @Transactional
     public void newDeposit(SimpleTransactionDTO depositDTO) throws ResourceNotFound, InvalidInput {
-        if (depositDTO.getAmount().compareTo(BigDecimal.ZERO)<=0){
-            throw new InvalidInput("The amount must be greater than zero.");
-        }
-
         String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity user = userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new ResourceNotFound("The user does not exist."));
@@ -108,10 +104,6 @@ public class TransactionService implements ITransactionService {
     @Override
     @Transactional
     public void newWithdraw(SimpleTransactionDTO withdrawDTO) throws ResourceNotFound, InvalidInput {
-        if (withdrawDTO.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidInput("The amount must be greater than zero.");
-        }
-
         String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity user = userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new ResourceNotFound("The user does not exist."));
@@ -131,10 +123,6 @@ public class TransactionService implements ITransactionService {
     @Override
     @Transactional
     public void newTransfer(TransferDTO transferDTO) throws ResourceNotFound, InvalidInput {
-        if (transferDTO.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidInput("The amount must be greater than zero.");
-        }
-
         String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity originUser = userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new ResourceNotFound("The user does not exist."));
@@ -165,10 +153,6 @@ public class TransactionService implements ITransactionService {
     @Override
     @Transactional
     public void newExchange(ExchangeDTO exchangeDTO) throws ResourceNotFound, InvalidInput {
-        if (exchangeDTO.getOriginAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidInput("The amount must be greater than zero.");
-        }
-
         String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity user = userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new ResourceNotFound("The user does not exist."));

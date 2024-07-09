@@ -1,5 +1,6 @@
 package org.nacho.backend.controllers;
 
+import jakarta.validation.Valid;
 import org.nacho.backend.dtos.auth.AuthResponse;
 import org.nacho.backend.dtos.auth.LoginRequest;
 import org.nacho.backend.dtos.auth.RegisterRequest;
@@ -23,14 +24,14 @@ public class AuthController {
 
     @PreAuthorize("permitAll()")
     @PostMapping("register")
-    public ResponseEntity<AuthResponse> registerUser(@RequestBody RegisterRequest registerRequest) throws InvalidInput {
+    public ResponseEntity<AuthResponse> registerUser(@RequestBody @Valid RegisterRequest registerRequest) throws InvalidInput {
         AuthResponse response = userService.newUser(registerRequest);
         return ResponseEntity.status(201).body(response);
     }
 
     @PreAuthorize("permitAll()")
     @PostMapping("login")
-    public ResponseEntity<AuthResponse> loginUser(@RequestBody LoginRequest loginRequest) throws InvalidInput {
+    public ResponseEntity<AuthResponse> loginUser(@RequestBody @Valid LoginRequest loginRequest) throws InvalidInput {
         AuthResponse response = userService.login(loginRequest);
         return ResponseEntity.status(200).body(response);
     }

@@ -1,5 +1,6 @@
 package org.nacho.backend.controllers;
 
+import jakarta.validation.Valid;
 import org.nacho.backend.dtos.SuccessIntegerResponseDTO;
 import org.nacho.backend.dtos.SuccessStringResponseDTO;
 import org.nacho.backend.dtos.TransactionDTO;
@@ -27,28 +28,28 @@ public class TransactionController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("deposit")
-    public ResponseEntity<?> newDeposit(@RequestBody SimpleTransactionDTO depositDTO) throws ResourceNotFound, InvalidInput {
+    public ResponseEntity<?> newDeposit(@RequestBody @Valid SimpleTransactionDTO depositDTO) throws ResourceNotFound, InvalidInput {
         transactionService.newDeposit(depositDTO);
         return ResponseEntity.status(200).body(new SuccessStringResponseDTO("Deposit successfully completed"));
     }
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("withdraw")
-    public ResponseEntity<?> newWithdraw(@RequestBody SimpleTransactionDTO withdrawDTO) throws ResourceNotFound, InvalidInput {
+    public ResponseEntity<?> newWithdraw(@RequestBody @Valid SimpleTransactionDTO withdrawDTO) throws ResourceNotFound, InvalidInput {
         transactionService.newWithdraw(withdrawDTO);
         return ResponseEntity.status(200).body(new SuccessStringResponseDTO("Withdraw successfully completed"));
     }
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("transfer")
-    public ResponseEntity<?> newTransfer(@RequestBody TransferDTO transferDTO) throws ResourceNotFound, InvalidInput {
+    public ResponseEntity<?> newTransfer(@RequestBody @Valid TransferDTO transferDTO) throws ResourceNotFound, InvalidInput {
         transactionService.newTransfer(transferDTO);
         return ResponseEntity.status(200).body(new SuccessStringResponseDTO("Transfer successfully completed"));
     }
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("exchange")
-    public ResponseEntity<?> newExchange(@RequestBody ExchangeDTO exchangeDTO) throws ResourceNotFound, InvalidInput {
+    public ResponseEntity<?> newExchange(@RequestBody @Valid ExchangeDTO exchangeDTO) throws ResourceNotFound, InvalidInput {
         transactionService.newExchange(exchangeDTO);
         return ResponseEntity.status(200).body(new SuccessStringResponseDTO("Exchange successfully completed"));
     }

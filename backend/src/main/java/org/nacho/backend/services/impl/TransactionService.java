@@ -92,12 +92,9 @@ public class TransactionService implements ITransactionService {
         UserEntity user = userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new ResourceNotFound("The user does not exist."));
 
-        Optional<Balance> balanceOptional = balanceRepository.findBalanceByCurrencyAndUserId(depositDTO.getCurrency(), user.getId());
-        if (balanceOptional.isEmpty()) {
-            throw new ResourceNotFound("Invalid currency.");
-        }
+        Balance balance = balanceRepository.findBalanceByCurrencyAndUserId(depositDTO.getCurrency(), user.getId())
+                .orElseThrow( () -> new ResourceNotFound("Invalid currency."));
 
-        Balance balance = balanceOptional.get();
         registerTransaction(TransactionType.DEPOSIT, user, balance, depositDTO.getAmount());
     }
 

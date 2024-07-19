@@ -45,7 +45,6 @@ class BalanceServiceTest {
         securityContext = mock(SecurityContext.class);
         authentication = mock(Authentication.class);
         mockedSecurityContextHolder.when(SecurityContextHolder::getContext).thenReturn(securityContext);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
 
         String username = "test_user";
         userAuthenticated = UserEntity.builder()
@@ -53,6 +52,7 @@ class BalanceServiceTest {
                 .username(username)
                 .build();
 
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userAuthenticated.getUsername());
     }
 
@@ -63,7 +63,6 @@ class BalanceServiceTest {
         Balance balanceARS = new Balance(Currency.ARS, BigDecimal.valueOf(300), userAuthenticated);
         List<Balance> balances = List.of(balanceUSD, balanceEUR, balanceARS);
 
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userAuthenticated.getUsername());
         when(userRepository.findUserByUsername(userAuthenticated.getUsername())).thenReturn(Optional.of(userAuthenticated));
         when(balanceRepository.findAllByUserId(userAuthenticated.getId())).thenReturn(balances);
 
@@ -78,7 +77,6 @@ class BalanceServiceTest {
 
     @Test
     public void testGetUserBalancesWhenUserDoesNotExists() throws ResourceNotFound {
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userAuthenticated.getUsername());
         when(userRepository.findUserByUsername(userAuthenticated.getUsername())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFound.class, () -> balanceService.getUserBalances());

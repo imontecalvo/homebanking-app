@@ -1,6 +1,5 @@
 package org.nacho.backend.services.impl;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.nacho.backend.dtos.transactions.SimpleTransactionDTO;
+import org.nacho.backend.dtos.transactions.TransferDTO;
 import org.nacho.backend.exceptions.InvalidInput;
 import org.nacho.backend.exceptions.ResourceNotFound;
 import org.nacho.backend.models.*;
@@ -19,8 +19,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -244,5 +244,187 @@ public class TransactionServiceTest {
 
         //Act and Assert
         assertThrows(InvalidInput.class, () ->  transactionService.newWithdraw(withdraw));
+    }
+
+    @Test
+    public void testNewTransferWhenSuccess() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        UserEntity destinationUser = UserEntity.builder()
+                .id(2L)
+                .username("destination_user")
+                .build();
+
+        TransferDTO transfer = TransferDTO.builder()
+                .currency(Currency.USD)
+                .amount(BigDecimal.valueOf(80.))
+                .destinationUsername(destinationUser.getUsername())
+                .build();
+
+        BigDecimal destinationInitBalanceAmount = BigDecimal.valueOf(10.);
+        BigDecimal originInitBalanceAmount = userBalances.get(transfer.getCurrency()).getAmount();
+        Balance destinationBalance = new Balance(Currency.USD, destinationInitBalanceAmount, destinationUser);
+
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername())).
+                thenReturn(Optional.of(userAuthenticated));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(transfer.getCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.of(userBalances.get(transfer.getCurrency())));
+        when(userRepository.findUserByUsername(destinationUser.getUsername()))
+                .thenReturn(Optional.of(destinationUser));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(transfer.getCurrency(), destinationUser.getId()))
+                .thenReturn(Optional.of(destinationBalance));
+
+        //Act
+        transactionService.newTransfer(transfer);
+
+        //Assert
+        ArgumentCaptor<Transaction> transactionArgumentCaptor = ArgumentCaptor.forClass(Transaction.class);
+        verify(transactionRepository, times(2)).save(transactionArgumentCaptor.capture());
+
+        ArgumentCaptor<Balance> balanceArgumentCaptor = ArgumentCaptor.forClass(Balance.class);
+        verify(balanceRepository, times(2)).save(balanceArgumentCaptor.capture());
+
+        List<Transaction> allTransactionsSaved = transactionArgumentCaptor.getAllValues();
+        assertEquals(TransactionType.TRANSFER, allTransactionsSaved.get(0).getType());
+        assertEquals(transfer.getCurrency(), allTransactionsSaved.get(0).getCurrency());
+        assertEquals(transfer.getAmount().multiply(BigDecimal.valueOf(-1)), allTransactionsSaved.get(0).getAmount());
+        assertEquals(userAuthenticated, allTransactionsSaved.get(0).getUser());
+        assertEquals(TransactionType.TRANSFER, allTransactionsSaved.get(1).getType());
+        assertEquals(transfer.getCurrency(), allTransactionsSaved.get(1).getCurrency());
+        assertEquals(transfer.getAmount(), allTransactionsSaved.get(1).getAmount());
+        assertEquals(destinationUser, allTransactionsSaved.get(1).getUser());
+
+        List<Balance> allBalancesSaved = balanceArgumentCaptor.getAllValues();
+        assertEquals(transfer.getCurrency(), allBalancesSaved.get(0).getCurrency());
+        assertEquals(originInitBalanceAmount.subtract(transfer.getAmount()), allBalancesSaved.get(0).getAmount());
+        assertEquals(transfer.getCurrency(), allBalancesSaved.get(1).getCurrency());
+        assertEquals(destinationInitBalanceAmount.add(transfer.getAmount()), allBalancesSaved.get(1).getAmount());
+    }
+
+    @Test
+    public void testNewTransferWhenUserDoesNotExist() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        UserEntity destinationUser = UserEntity.builder()
+                .id(2L)
+                .username("destination_user")
+                .build();
+
+        TransferDTO transfer = TransferDTO.builder()
+                .currency(Currency.USD)
+                .amount(BigDecimal.valueOf(80.))
+                .destinationUsername(destinationUser.getUsername())
+                .build();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername())).
+                thenReturn(Optional.empty());
+
+        //Act and Assert
+        assertThrows(ResourceNotFound.class, () ->  transactionService.newTransfer(transfer));
+    }
+
+    @Test
+    public void testNewTransferWhenInvalidCurrency() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        UserEntity destinationUser = UserEntity.builder()
+                .id(2L)
+                .username("destination_user")
+                .build();
+
+        TransferDTO transfer = TransferDTO.builder()
+                .currency(Currency.USD)
+                .amount(BigDecimal.valueOf(80.))
+                .destinationUsername(destinationUser.getUsername())
+                .build();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername())).
+                thenReturn(Optional.of(userAuthenticated));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(transfer.getCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.empty());
+
+        //Act and Assert
+        assertThrows(ResourceNotFound.class, () ->  transactionService.newTransfer(transfer));
+    }
+
+    @Test
+    public void testNewTransferWhenDestinationUserDoesNotExist() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        UserEntity destinationUser = UserEntity.builder()
+                .id(2L)
+                .username("destination_user")
+                .build();
+
+        TransferDTO transfer = TransferDTO.builder()
+                .currency(Currency.USD)
+                .amount(BigDecimal.valueOf(80.))
+                .destinationUsername(destinationUser.getUsername())
+                .build();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername())).
+                thenReturn(Optional.of(userAuthenticated));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(transfer.getCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.of(userBalances.get(transfer.getCurrency())));
+        when(userRepository.findUserByUsername(destinationUser.getUsername()))
+                .thenReturn(Optional.empty());
+
+        //Act and Assert
+        assertThrows(ResourceNotFound.class, () ->  transactionService.newTransfer(transfer));
+    }
+
+    @Test
+    public void testNewTransferWhenInvalidDestinationCurrency() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        UserEntity destinationUser = UserEntity.builder()
+                .id(2L)
+                .username("destination_user")
+                .build();
+
+        TransferDTO transfer = TransferDTO.builder()
+                .currency(Currency.USD)
+                .amount(BigDecimal.valueOf(80.))
+                .destinationUsername(destinationUser.getUsername())
+                .build();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername())).
+                thenReturn(Optional.of(userAuthenticated));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(transfer.getCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.of(userBalances.get(transfer.getCurrency())));
+        when(userRepository.findUserByUsername(destinationUser.getUsername()))
+                .thenReturn(Optional.of(destinationUser));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(transfer.getCurrency(), destinationUser.getId()))
+                .thenReturn(Optional.empty());
+
+        //Act and Assert
+        assertThrows(ResourceNotFound.class, () ->  transactionService.newTransfer(transfer));
+    }
+
+    @Test
+    public void testNewTransferWhenInsufficientFunds() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        UserEntity destinationUser = UserEntity.builder()
+                .id(2L)
+                .username("destination_user")
+                .build();
+
+        TransferDTO transfer = TransferDTO.builder()
+                .currency(Currency.USD)
+                .amount(BigDecimal.valueOf(1000.))
+                .destinationUsername(destinationUser.getUsername())
+                .build();
+
+        BigDecimal destinationInitBalanceAmount = BigDecimal.valueOf(10.);
+        Balance destinationBalance = new Balance(Currency.USD, destinationInitBalanceAmount, destinationUser);
+
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername())).
+                thenReturn(Optional.of(userAuthenticated));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(transfer.getCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.of(userBalances.get(transfer.getCurrency())));
+        when(userRepository.findUserByUsername(destinationUser.getUsername()))
+                .thenReturn(Optional.of(destinationUser));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(transfer.getCurrency(), destinationUser.getId()))
+                .thenReturn(Optional.of(destinationBalance));
+
+        //Act and Assert
+        assertThrows(InvalidInput.class, () ->  transactionService.newTransfer(transfer));
     }
 }

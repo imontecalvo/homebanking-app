@@ -1,5 +1,6 @@
 package org.nacho.backend.services.impl;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -151,5 +152,97 @@ public class TransactionServiceTest {
         assertThrows(ResourceNotFound.class, () ->  transactionService.newDeposit(deposit));
     }
 
+    @Test
+    public void newWithdrawWhenSuccess() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        SimpleTransactionDTO withdraw = SimpleTransactionDTO.builder()
+                .amount(BigDecimal.valueOf(10.))
+                .currency(Currency.USD)
+                .build();
 
+        Transaction transaction = Transaction.builder()
+                .type(TransactionType.WITHDRAW)
+                .currency(withdraw.getCurrency())
+                .amount(withdraw.getAmount())
+                .user(userAuthenticated)
+                .build();
+
+        BigDecimal initBalanceAmount = userBalances.get(withdraw.getCurrency()).getAmount();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername())).
+                thenReturn(Optional.of(userAuthenticated));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(withdraw.getCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.of(userBalances.get(withdraw.getCurrency())));
+
+        //Act
+        transactionService.newWithdraw(withdraw);
+
+        //Assert
+        ArgumentCaptor<Transaction> transactionArgumentCaptor = ArgumentCaptor.forClass(Transaction.class);
+        verify(transactionRepository).save(any(Transaction.class));
+        verify(transactionRepository).save(transactionArgumentCaptor.capture());
+
+        ArgumentCaptor<Balance> balanceArgumentCaptor = ArgumentCaptor.forClass(Balance.class);
+        verify(balanceRepository).save(any(Balance.class));
+        verify(balanceRepository).save(balanceArgumentCaptor.capture());
+
+        Transaction actualTransaction = transactionArgumentCaptor.getValue();
+        assertEquals(transaction.getType(), actualTransaction.getType());
+        assertEquals(transaction.getCurrency(), actualTransaction.getCurrency());
+        assertEquals(transaction.getAmount().multiply(BigDecimal.valueOf(-1)), actualTransaction.getAmount());
+        assertEquals(transaction.getUser(), actualTransaction.getUser());
+
+        Balance actualBalance = balanceArgumentCaptor.getValue();
+        assertEquals(withdraw.getCurrency(), actualBalance.getCurrency());
+        assertEquals(initBalanceAmount.subtract(withdraw.getAmount()), actualBalance.getAmount());
+    }
+
+    @Test
+    public void testNewWithdrawWhenUserDoesNotExist() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        SimpleTransactionDTO withdraw = SimpleTransactionDTO.builder()
+                .amount(BigDecimal.valueOf(10.))
+                .currency(Currency.USD)
+                .build();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername())).
+                thenReturn(Optional.empty());
+
+        //Act and Assert
+        assertThrows(ResourceNotFound.class, () ->  transactionService.newWithdraw(withdraw));
+    }
+
+    @Test
+    public void testNewWithdrawWhenInvalidCurrency() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        SimpleTransactionDTO withdraw = SimpleTransactionDTO.builder()
+                .amount(BigDecimal.valueOf(10.))
+                .currency(Currency.USD)
+                .build();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername())).
+                thenReturn(Optional.of(userAuthenticated));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(withdraw.getCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.empty());
+
+        //Act and Assert
+        assertThrows(ResourceNotFound.class, () ->  transactionService.newWithdraw(withdraw));
+    }
+
+    @Test
+    public void testNewWithdrawWhenInsufficientBalance() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        SimpleTransactionDTO withdraw = SimpleTransactionDTO.builder()
+                .amount(BigDecimal.valueOf(1000.))
+                .currency(Currency.USD)
+                .build();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername())).
+                thenReturn(Optional.of(userAuthenticated));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(withdraw.getCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.of(userBalances.get(withdraw.getCurrency())));
+
+        //Act and Assert
+        assertThrows(InvalidInput.class, () ->  transactionService.newWithdraw(withdraw));
+    }
 }

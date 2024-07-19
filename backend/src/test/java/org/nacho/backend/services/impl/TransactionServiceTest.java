@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.nacho.backend.dtos.TransactionDTO;
 import org.nacho.backend.dtos.external.ExchangeAPIResponseDTO;
 import org.nacho.backend.dtos.transactions.ExchangeDTO;
 import org.nacho.backend.dtos.transactions.SimpleTransactionDTO;
@@ -16,6 +17,9 @@ import org.nacho.backend.models.*;
 import org.nacho.backend.repositories.IBalanceRepository;
 import org.nacho.backend.repositories.ITransactionRepository;
 import org.nacho.backend.repositories.IUserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,8 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -78,6 +81,158 @@ public class TransactionServiceTest {
             Balance balance = new Balance(currency, INIT_BALANCE_AMOUNT, userAuthenticated);
             userBalances.put(currency, balance);
         }
+    }
+
+    @Test
+    public void testConvertCurrencyWhenSuccess() throws ResourceNotFound {
+        //Arrange
+        Currency origin = Currency.USD;
+        Currency destination = Currency.ARS;
+        BigDecimal amountToConvert = BigDecimal.valueOf(50.);
+        BigDecimal expectedResult = amountToConvert.multiply(BigDecimal.TEN);
+
+        when(userRepository.existsByUsername(userAuthenticated.getUsername()))
+                .thenReturn(true);
+        when(restTemplate.getForObject(any(String.class), any()))
+                .thenReturn(ExchangeAPIResponseDTO.builder().value(expectedResult).build());
+
+        //Act
+        BigDecimal result = transactionService.convertCurrency(origin, destination, amountToConvert);
+
+        //Assert
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    public void testConvertCurrencyWhenUserDoesNotExist() throws ResourceNotFound {
+        //Arrange
+        Currency origin = Currency.USD;
+        Currency destination = Currency.ARS;
+        BigDecimal amountToConvert = BigDecimal.valueOf(50.);
+
+        when(userRepository.existsByUsername(userAuthenticated.getUsername()))
+                .thenReturn(false);
+
+        //Act and Assert
+        assertThrows(ResourceNotFound.class, () -> transactionService.convertCurrency(origin, destination, amountToConvert));
+    }
+
+    @Test
+    public void testGetNumberOfTransactionsWhenSuccess() throws ResourceNotFound {
+        //Arrange
+        Long expectedResult = 25L;
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername()))
+                .thenReturn(Optional.ofNullable(userAuthenticated));
+        when(transactionRepository.countByUserId(userAuthenticated.getId()))
+                .thenReturn(expectedResult);
+
+        //Act
+        Long result = transactionService.getNumberOfTransactions();
+
+        //Assert
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
+    public void testGetNumberOfTransactionsWhenUserDoesNotExist() throws ResourceNotFound {
+        //Arrange
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername()))
+                .thenReturn(Optional.empty());
+
+        //Act and Assert
+        assertThrows(ResourceNotFound.class, () -> transactionService.getNumberOfTransactions());
+    }
+
+    @Test
+    public void testGetTransactionHistoryWhenSuccess() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        Integer page = 0;
+        Integer pageSize = 2;
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "date"));
+
+        Transaction t1 = Transaction.builder()
+                .type(TransactionType.DEPOSIT)
+                .currency(Currency.USD)
+                .amount(BigDecimal.valueOf(150.))
+                .build();
+
+        Transaction t2 = Transaction.builder()
+                .type(TransactionType.WITHDRAW)
+                .currency(Currency.ARS)
+                .amount(BigDecimal.valueOf(50.))
+                .build();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername()))
+                .thenReturn(Optional.of(userAuthenticated));
+        when(transactionRepository.findAllByUserId(userAuthenticated.getId(), pageable))
+                .thenReturn(List.of(t1,t2));
+
+        //Act
+        List<TransactionDTO> history = transactionService.getTransactionHistory(page, pageSize);
+
+        //Assert
+        List<TransactionDTO> expectedHistory = List.of(t1,t2).stream().map(
+                transaction -> TransactionDTO.builder()
+                        .type(transaction.getType())
+                        .currency(transaction.getCurrency())
+                        .amount(transaction.getAmount())
+                        .username(userAuthenticated.getUsername())
+                        .build()
+        ).toList();
+
+        assertEquals(pageSize, history.size());
+        assertEquals(expectedHistory.get(0), history.get(0));
+        assertEquals(expectedHistory.get(1), history.get(1));
+    }
+
+    @Test
+    public void testGetTransactionHistoryWhenPageIsNegative() {
+        //Arrange
+        Integer page = -1;
+        Integer pageSize = 2;
+
+        //Act and Assert
+        assertThrows(InvalidInput.class, () -> transactionService.getTransactionHistory(page, pageSize));
+    }
+
+    @Test
+    public void testGetTransactionHistoryWhenPageSizeIsNegative() {
+        //Arrange
+        Integer page = 0;
+        Integer pageSize = -1;
+
+        //Act and Assert
+        assertThrows(InvalidInput.class, () -> transactionService.getTransactionHistory(page, pageSize));
+    }
+
+    @Test
+    public void testGetTransactionHistoryWhenPageSizeIsEqualsToZero() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        Integer page = 0;
+        Integer pageSize = 0;
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername()))
+                .thenReturn(Optional.of(userAuthenticated));
+
+        //Act
+        List<TransactionDTO> history = transactionService.getTransactionHistory(page, pageSize);
+
+        //Assert
+        assertTrue(history.isEmpty());
+    }
+
+    @Test
+    public void testGetTransactionHistoryWhenUserDoesNotExist() {
+        //Arrange
+        Integer page = 0;
+        Integer pageSize = 10;
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername()))
+                .thenReturn(Optional.empty());
+
+        //Act and Assert
+        assertThrows(ResourceNotFound.class, () -> transactionService.getTransactionHistory(page, pageSize));
     }
 
     @Test

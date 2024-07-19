@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.nacho.backend.dtos.external.ExchangeAPIResponseDTO;
+import org.nacho.backend.dtos.transactions.ExchangeDTO;
 import org.nacho.backend.dtos.transactions.SimpleTransactionDTO;
 import org.nacho.backend.dtos.transactions.TransferDTO;
 import org.nacho.backend.exceptions.InvalidInput;
@@ -17,6 +19,7 @@ import org.nacho.backend.repositories.IUserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -37,6 +40,8 @@ public class TransactionServiceTest {
     private IUserRepository userRepository;
     @Mock
     private ITransactionRepository transactionRepository;
+    @Mock
+    private RestTemplate restTemplate;
     @InjectMocks
     private TransactionService transactionService;
 
@@ -427,4 +432,137 @@ public class TransactionServiceTest {
         //Act and Assert
         assertThrows(InvalidInput.class, () ->  transactionService.newTransfer(transfer));
     }
+
+    @Test
+    public void testNewExchangeWhenSuccess() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        ExchangeDTO exchange = ExchangeDTO.builder()
+                .originCurrency(Currency.USD)
+                .originAmount(BigDecimal.valueOf(20.))
+                .destinationCurrency(Currency.ARS)
+                .build();
+
+        BigDecimal originInitBalanceAmount = userBalances.get(exchange.getOriginCurrency()).getAmount();
+        BigDecimal destinationInitBalanceAmount = userBalances.get(exchange.getDestinationCurrency()).getAmount();
+        BigDecimal conversionResult = exchange.getOriginAmount().multiply(BigDecimal.TEN);
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername()))
+                .thenReturn(Optional.ofNullable(userAuthenticated));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(exchange.getOriginCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.of(userBalances.get(exchange.getOriginCurrency())));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(exchange.getDestinationCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.of(userBalances.get(exchange.getDestinationCurrency())));
+        when(restTemplate.getForObject(any(String.class), any()))
+                .thenReturn(ExchangeAPIResponseDTO.builder()
+                        .value(conversionResult)
+                        .build());
+
+        //Act
+        transactionService.newExchange(exchange);
+
+        //Assert
+        ArgumentCaptor<Transaction> transactionArgumentCaptor = ArgumentCaptor.forClass(Transaction.class);
+        verify(transactionRepository, times(2)).save(transactionArgumentCaptor.capture());
+
+        ArgumentCaptor<Balance> balanceArgumentCaptor = ArgumentCaptor.forClass(Balance.class);
+        verify(balanceRepository, times(2)).save(balanceArgumentCaptor.capture());
+
+        List<Transaction> allTransactions = transactionArgumentCaptor.getAllValues();
+
+        assertEquals(TransactionType.EXCHANGE,allTransactions.get(0).getType());
+        assertEquals(userAuthenticated,allTransactions.get(0).getUser());
+        assertEquals(exchange.getOriginCurrency(),allTransactions.get(0).getCurrency());
+        assertEquals(exchange.getOriginAmount().multiply(BigDecimal.valueOf(-1)),allTransactions.get(0).getAmount());
+
+        BigDecimal destinationAmountAfterFees = conversionResult.subtract(conversionResult.multiply(TransactionService.EXCHANGE_FEE_RATE));
+
+        assertEquals(TransactionType.EXCHANGE,allTransactions.get(1).getType());
+        assertEquals(userAuthenticated,allTransactions.get(1).getUser());
+        assertEquals(exchange.getDestinationCurrency(),allTransactions.get(1).getCurrency());
+        assertEquals(destinationAmountAfterFees,allTransactions.get(1).getAmount());
+
+        List<Balance> allBalances = balanceArgumentCaptor.getAllValues();
+
+        assertEquals(exchange.getOriginCurrency(), allBalances.get(0).getCurrency());
+        assertEquals(originInitBalanceAmount.subtract(exchange.getOriginAmount()), allBalances.get(0).getAmount());
+
+        assertEquals(exchange.getDestinationCurrency(), allBalances.get(1).getCurrency());
+        assertEquals(destinationInitBalanceAmount.add(destinationAmountAfterFees), allBalances.get(1).getAmount());
+    }
+
+    @Test
+    public void testNewExchangeWhenUserDoesNotExist() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        ExchangeDTO exchange = ExchangeDTO.builder()
+                .originCurrency(Currency.USD)
+                .originAmount(BigDecimal.valueOf(20.))
+                .destinationCurrency(Currency.ARS)
+                .build();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername())).
+                thenReturn(Optional.empty());
+
+        //Act and Assert
+        assertThrows(ResourceNotFound.class, () ->  transactionService.newExchange(exchange));
+    }
+
+    @Test
+    public void testNewExchangeWhenInvalidOriginCurrency() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        ExchangeDTO exchange = ExchangeDTO.builder()
+                .originCurrency(Currency.USD)
+                .originAmount(BigDecimal.valueOf(20.))
+                .destinationCurrency(Currency.ARS)
+                .build();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername())).
+                thenReturn(Optional.of(userAuthenticated));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(exchange.getOriginCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.empty());
+
+        //Act and Assert
+        assertThrows(ResourceNotFound.class, () ->  transactionService.newExchange(exchange));
+    }
+
+    @Test
+    public void testNewExchangeWhenInvalidDestinationCurrency() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        ExchangeDTO exchange = ExchangeDTO.builder()
+                .originCurrency(Currency.USD)
+                .originAmount(BigDecimal.valueOf(20.))
+                .destinationCurrency(Currency.ARS)
+                .build();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername()))
+                .thenReturn(Optional.ofNullable(userAuthenticated));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(exchange.getOriginCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.of(userBalances.get(exchange.getOriginCurrency())));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(exchange.getDestinationCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.empty());
+
+        //Act and Assert
+        assertThrows(ResourceNotFound.class, () ->  transactionService.newExchange(exchange));
+    }
+
+    @Test
+    public void testNewExchangeWhenInsufficientFunds() throws ResourceNotFound, InvalidInput {
+        //Arrange
+        ExchangeDTO exchange = ExchangeDTO.builder()
+                .originCurrency(Currency.USD)
+                .originAmount(BigDecimal.valueOf(1000.))
+                .destinationCurrency(Currency.ARS)
+                .build();
+
+        when(userRepository.findUserByUsername(userAuthenticated.getUsername()))
+                .thenReturn(Optional.ofNullable(userAuthenticated));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(exchange.getOriginCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.of(userBalances.get(exchange.getOriginCurrency())));
+        when(balanceRepository.findBalanceByCurrencyAndUserId(exchange.getDestinationCurrency(), userAuthenticated.getId()))
+                .thenReturn(Optional.of(userBalances.get(exchange.getDestinationCurrency())));
+
+        //Act and Assert
+        assertThrows(InvalidInput.class, () ->  transactionService.newExchange(exchange));
+    }
+
 }
+

@@ -42,7 +42,7 @@ public class TransactionService implements ITransactionService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private static final BigDecimal EXCHANGE_FEE_RATE = BigDecimal.valueOf(0.01);
+    public static final BigDecimal EXCHANGE_FEE_RATE = BigDecimal.valueOf(0.01);
 
     public BigDecimal convertCurrency(Currency from, Currency to, BigDecimal amount) throws ResourceNotFound {
         String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

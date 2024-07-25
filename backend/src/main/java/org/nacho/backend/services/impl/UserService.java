@@ -47,7 +47,7 @@ public class UserService implements IUserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private final BigDecimal INIT_BALANCE = BigDecimal.valueOf(2000);
+    public final BigDecimal INIT_BALANCE = BigDecimal.valueOf(2000);
 
     @Transactional
     @Override
@@ -89,7 +89,7 @@ public class UserService implements IUserService {
                 .build();
     }
 
-    private Set<Role> getRolesFromEnums(List<RoleEnum> enumRoles) {
+    private Set<Role> getRolesFromEnums(List<RoleEnum> enumRoles){
         Set<Role> roles = new HashSet<>();
 
         enumRoles.forEach(role -> {
@@ -106,7 +106,7 @@ public class UserService implements IUserService {
         return roles;
     }
 
-    private String createToken(String username, String password) {
+    public String createToken(String username, String password) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         Authentication authentication = new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
         return jwtUtils.createToken(authentication);

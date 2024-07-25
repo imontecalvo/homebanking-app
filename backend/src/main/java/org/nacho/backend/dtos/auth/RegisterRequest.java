@@ -3,12 +3,14 @@ package org.nacho.backend.dtos.auth;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
 import org.nacho.backend.models.Currency;
 import org.nacho.backend.models.roles_authorities.RoleEnum;
 
 import java.util.List;
 
+@Builder
 @Data
 public class RegisterRequest {
     @NotBlank

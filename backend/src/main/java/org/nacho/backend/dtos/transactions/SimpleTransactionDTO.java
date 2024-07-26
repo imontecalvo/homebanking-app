@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @Builder
 @Data
 public class SimpleTransactionDTO {
+    @NotNull
     private Currency currency;
 
     @NotNull @Positive

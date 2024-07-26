@@ -12,8 +12,10 @@ import java.math.BigDecimal;
 @Builder
 @Data
 public class ExchangeDTO {
+    @NotNull
     private Currency originCurrency;
 
+    @NotNull
     private Currency destinationCurrency;
 
     @NotNull

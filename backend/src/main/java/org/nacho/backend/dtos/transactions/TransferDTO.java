@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @Builder
 @Data
 public class TransferDTO {
+    @NotNull
     private Currency currency;
 
     @NotNull

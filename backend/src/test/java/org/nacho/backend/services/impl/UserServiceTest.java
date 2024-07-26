@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.nacho.backend.dtos.auth.AuthResponse;
+import org.nacho.backend.dtos.auth.LoginRequest;
 import org.nacho.backend.dtos.auth.RegisterRequest;
 import org.nacho.backend.exceptions.InvalidInput;
 import org.nacho.backend.models.Balance;
@@ -18,9 +19,9 @@ import org.nacho.backend.models.roles_authorities.RoleEnum;
 import org.nacho.backend.repositories.IBalanceRepository;
 import org.nacho.backend.repositories.IRoleRepository;
 import org.nacho.backend.repositories.IUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
@@ -43,7 +44,8 @@ public class UserServiceTest {
     IBalanceRepository balanceRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
-
+    @Mock
+    AuthenticationManager authenticationManager;
     @Test
     public void testNewUserWhenSuccess() throws InvalidInput {
         //Arrange
@@ -139,5 +141,39 @@ public class UserServiceTest {
 
         //Act & Assert
         assertThrows(RuntimeException.class, () -> userService.newUser(request));
+    }
+
+    @Test
+    public void testLoginWhenSuccess(){
+        //Arrange
+        LoginRequest loginRequest = LoginRequest.builder()
+                .username("test_user")
+                .password("test_password")
+                .build();
+        String expectedToken = "test_token";
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
+        doReturn(expectedToken).when(userService).createToken(loginRequest.getUsername(), loginRequest.getPassword());
+
+        //Act
+        AuthResponse response = userService.login(loginRequest);
+
+        //Assert
+        assertEquals(loginRequest.getUsername(), response.getUsername());
+        assertEquals(expectedToken, response.getToken());
+    }
+
+    @Test
+    public void testLoginWhenAuthenticationFails(){
+        //Arrange
+        LoginRequest loginRequest = LoginRequest.builder()
+                .username("test_user")
+                .password("test_password")
+                .build();
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new AuthenticationException("Bad credentials") {});
+
+        //Act & Assert
+        assertThrows(AuthenticationException.class, () -> userService.login(loginRequest));
     }
 }

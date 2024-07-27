@@ -25,8 +25,10 @@ public class RegisterRequest {
     @NotNull
     private String confirmPassword;
 
+    @NotNull
     private Currency currency;
 
+    @NotNull
     @Size.List({@Size(min = 1), @Size(max = 3)})
     private List<RoleEnum> roles;
 }

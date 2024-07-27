@@ -1,11 +1,15 @@
 package org.nacho.backend.dtos;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import org.nacho.backend.models.Currency;
 import org.nacho.backend.models.UserEntity;
 
 import java.math.BigDecimal;
 
+@Builder
+@AllArgsConstructor
 @Data
 public class BalanceDTO {
     private Currency currency;

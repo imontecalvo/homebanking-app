@@ -93,7 +93,7 @@ public class AuthControllerTest {
                 "\"username\":\"test_username\",\n" +
                 "\"password\":\"test_password\",\n" +
                 "\"confirmPassword\":\"test_password\",\n" +
-                "\"roles\":[\"USER\"],\n" +
+                "\"roles\":[\"USER\"]\n" +
                 "}";
 
         //Act & Assert

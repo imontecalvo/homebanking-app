@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class RegisterRequest {
     @NotBlank
-    @NotNull()
+    @NotNull
     private String username;
 
     @NotBlank

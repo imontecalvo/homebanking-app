@@ -1,5 +1,6 @@
 package org.nacho.backend.services.impl;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,6 +55,11 @@ class BalanceServiceTest {
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userAuthenticated.getUsername());
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        mockedSecurityContextHolder.close();
     }
 
     @Test

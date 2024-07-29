@@ -1,5 +1,6 @@
 package org.nacho.backend.services.impl;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,11 @@ public class TransactionServiceTest {
                 .build();
 
         when(authentication.getPrincipal()).thenReturn(userAuthenticated.getUsername());
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        mockedSecurityContextHolder.close();
     }
 
     @BeforeEach

@@ -20,43 +20,45 @@ public class BackendApplication {
         SpringApplication.run(BackendApplication.class, args);
     }
 
-   /* @Bean
-    CommandLineRunner init(IRoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    @Bean
+    CommandLineRunner init(IRoleRepository roleRepository) {
         return args -> {
-            Permission readPermission = Permission.builder().name("READ").build();
-            Permission exchangePermission = Permission.builder().name("EXCHANGE").build();
-            Permission transferPermission = Permission.builder().name("TRANSFER").build();
-            Permission withdrawPermission = Permission.builder().name("WITHDRAW").build();
-            Permission depositPermission = Permission.builder().name("DEPOSIT").build();
-            Permission deleteTransactionPermission = Permission.builder().name("DELETE_TRANSACTION").build();
-            Permission deleteUserPermission = Permission.builder().name("DELETE_USER").build();
+            if (roleRepository.findAll().isEmpty()){
+                Permission readPermission = Permission.builder().name("READ").build();
+                Permission exchangePermission = Permission.builder().name("EXCHANGE").build();
+                Permission transferPermission = Permission.builder().name("TRANSFER").build();
+                Permission withdrawPermission = Permission.builder().name("WITHDRAW").build();
+                Permission depositPermission = Permission.builder().name("DEPOSIT").build();
+                Permission deleteTransactionPermission = Permission.builder().name("DELETE_TRANSACTION").build();
+                Permission deleteUserPermission = Permission.builder().name("DELETE_USER").build();
 
-            Role userRole = Role.builder()
-                    .name(RoleEnum.USER)
-                    .permissions(Set.of(
-                            readPermission,
-                            exchangePermission,
-                            transferPermission,
-                            withdrawPermission,
-                            depositPermission
-                    ))
-                    .build();
+                Role userRole = Role.builder()
+                        .name(RoleEnum.USER)
+                        .permissions(Set.of(
+                                readPermission,
+                                exchangePermission,
+                                transferPermission,
+                                withdrawPermission,
+                                depositPermission
+                        ))
+                        .build();
 
-            Role adminRole = Role.builder()
-                    .name(RoleEnum.ADMIN)
-                    .permissions(Set.of(
-                            readPermission,
-                            deleteUserPermission,
-                            deleteTransactionPermission
-                    ))
-                    .build();
+                Role adminRole = Role.builder()
+                        .name(RoleEnum.ADMIN)
+                        .permissions(Set.of(
+                                readPermission,
+                                deleteUserPermission,
+                                deleteTransactionPermission
+                        ))
+                        .build();
 
-            Role invitedRole = Role.builder()
-                    .name(RoleEnum.INVITED)
-                    .permissions(Set.of(readPermission))
-                    .build();
+                Role invitedRole = Role.builder()
+                        .name(RoleEnum.INVITED)
+                        .permissions(Set.of(readPermission))
+                        .build();
 
-            roleRepository.saveAll(List.of(userRole, adminRole, invitedRole));
+                roleRepository.saveAll(List.of(userRole, adminRole, invitedRole));
+            }
         };
-    }*/
+    }
 }

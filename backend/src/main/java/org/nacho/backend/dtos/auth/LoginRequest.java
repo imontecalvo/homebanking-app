@@ -2,8 +2,10 @@ package org.nacho.backend.dtos.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 
+@Builder
 @Data
 public class LoginRequest {
     @NotNull

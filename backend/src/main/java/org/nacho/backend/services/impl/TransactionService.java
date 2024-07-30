@@ -87,7 +87,7 @@ public class TransactionService implements ITransactionService {
 
     @Override
     @Transactional
-    public void newDeposit(SimpleTransactionDTO depositDTO) throws ResourceNotFound, InvalidInput {
+    public void newDeposit(SimpleTransactionDTO depositDTO) throws ResourceNotFound {
         String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity user = userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new ResourceNotFound("The user does not exist."));

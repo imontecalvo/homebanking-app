@@ -1,7 +1,6 @@
 import * as React from "react";
 import NavBar from "../../components/navbar/NavBar";
 import TransactionTypeCard from "../../components/transaction_type_card/TransactionTypeCard";
-import Modal from "@mui/material/Modal";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import "./transactions_style.css";

@@ -12,10 +12,10 @@ const TransactionTypeCard = ({ transaction, handleClick }) => {
       : withdrawImg;
 
   return (
-    <div className="card" onClick={handleClick}>
+    <div className="card" style={{cursor:'pointer'}} onClick={handleClick}>
       <h1 className="title">{transaction}</h1>
       <div>
-        <img src={icon} style={{ maxWidth: "250px", maxHeight: "250px" }}></img>
+        <img src={icon} style={{ maxWidth: "250px", maxHeight: "250px"}}></img>
       </div>
     </div>
   );

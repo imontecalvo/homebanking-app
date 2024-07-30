@@ -7,4 +7,4 @@ COPY ./dist ./dist
 
 EXPOSE 3000
 
-CMD serve -s dist
+CMD [ "npx", "serve", "dist" ]

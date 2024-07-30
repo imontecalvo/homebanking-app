@@ -14,16 +14,29 @@ services:
 
   homebanking_api:
     container_name: homebanking_api
-    build: .
+    build: backend
     depends_on:
       - homebanking_db
     ports:
-      - 8081:8080
+      - 8080:8080
     environment:
       - DB_URL=jdbc:postgresql://homebanking_db:5432/homebanking
       - DB_USER=postgres
       - DB_PASSWORD=admin
     networks:
       - spring-network
+      - frontend-network
+
+  homebanking_frontend:
+    container_name: homebanking_frontend
+    build: client
+    ports:
+      - 3000:3000
+    depends_on:
+      - homebanking_api
+    networks:
+      - frontend-network
+
 networks:
   spring-network:
+  frontend-network:
